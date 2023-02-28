@@ -23,30 +23,35 @@ client = MongoClient('localhost', 27017)
 db = client.dbsparta
 
 
-## 메인페이지
+# 메인페이지
 @app.route('/')
 def home():
-   return render_template('index.html')
+    test = db.product.find_one({'category': 'necessity'})
+    recommend_product_info = {'category': test['category'], 'name': test['name'], 'price': str(
+        test['price']), 'imgUrl': test['imgUrl'], 'count': test['count'], 'likes': str(test['likes']), 'buyer': test['buyer']}
+    return render_template('index.html', recommend_product_info=recommend_product_info, a={"a": '0'})
 
-#로그인
+# 로그인
+
+
 @app.route('/login')
 def loginView():
     return render_template('login.html')
 
 
-
 @app.route('/token/auth', methods=['POST'])
-def login(): 
+def login():
     email = request.form['email_give']
     password = request.form['password_give']
-    checkExist = None if db.user.find_one({'email': email}) == None else db.user.find_one({'email': email})
-    ##이메일 체크
+    checkExist = None if db.user.find_one(
+        {'email': email}) == None else db.user.find_one({'email': email})
+    # 이메일 체크
     if checkExist is None:
         return '존재하지 않는 이메일입니다. 이메일을 확인하세요.', 400
 
-    ##비밀번호 체크
+    # 비밀번호 체크
     checkPassword = checkExist['password']
-    print( bcrypt.check_password_hash(checkPassword, password))
+    print(bcrypt.check_password_hash(checkPassword, password))
     if bcrypt.check_password_hash(checkPassword, password) is False:
         return '비밀번호가 다릅니다. 비밀번호를 확인하세요.', 400
     username = checkExist['username']
@@ -56,7 +61,6 @@ def login():
     set_access_cookies(resp, access_token)
     set_refresh_cookies(resp, refresh_token)
     return resp, 200
-    
 
 
 @app.route('/protected', methods=['GET'])
@@ -66,28 +70,38 @@ def detailPage():
     return jsonify(logged_in_as=current_user), 200
 
 
+@app.route('/detail')
+def detailView():
+    return render_template('detail.html')
 
-#회원가입 뷰
+# 회원가입 뷰
+
+
 @app.route('/signup', methods=['GET'])
 def signupView():
     return render_template('signUp.html')
 
-##api
+# api
+
+
 @app.route('/signup', methods=['POST'])
 def signup():
     username = request.form['username_give']
     email = request.form['email_give']
     password = request.form['password_give']
-    checkExistEmail = None if db.user.find_one({'email': email}) == None else db.user.find_one({'email': email})['email']
+    checkExistEmail = None if db.user.find_one(
+        {'email': email}) == None else db.user.find_one({'email': email})['email']
     if checkExistEmail is None:
         hash_password = bcrypt.generate_password_hash(password)
-        newUser = {'username': username, 'email': email, 'password': hash_password}
+        newUser = {'username': username,
+                   'email': email, 'password': hash_password}
         db.user.insert_one(newUser)
-        return  jsonify({'msg': 'success'})
+        return jsonify({'msg': 'success'})
 
     if email == checkExistEmail:
         return '존재하는 이메일입니다.', 400
-    
+
+
 @app.route('/group-list', methods=['GET'])
 def show_group_category():
     all_group = db.list_collection_names()
@@ -98,46 +112,49 @@ def show_group_category():
 @app.route('/list', methods=['GET'])
 def show_products():
     keyword = request.args.get('keyword')
-    products = list(db[keyword].find({}, {'_id':False}).sort('likes', -1))
+    products = list(db[keyword].find({}, {'_id': False}).sort('likes', -1))
     print(products)
 
     return jsonify({'lists': products})
-
 
 
 # 입력받은 쿠팡 ulr로 데이터 DB에 넣기
 @app.route('/submit', methods=['POST'])
 def submit():
     url = request.form['url']
-    getData(url)
-    return jsonify({'return':'success'})
+    category = request.form['category']
+    count = request.form['count']
+    getData(url, category, count)
+    return jsonify({'return': 'success'})
 
-def getData(url):
 
+def getData(url, category, count):
     headers = {
-        'user-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
-        'sec-ch-ua' : '"Not_A Brand";v="99", "Google Chrome";v="109", "Chromium";v="109"',
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
+        'sec-ch-ua': '"Not_A Brand";v="99", "Google Chrome";v="109", "Chromium";v="109"',
         'sec-ch-ua-mobile': '?0',
         'sec-ch-ua-platform': '"Windows"',
-        'cookie': 'cookie: PCID=16505901704875933154078'
-        }
-
-    data = requests.get(url, headers = headers, verify=False)
-
-    soup = BeautifulSoup(data.text, 'html.parser')
-
-    name = soup.select_one('.prod-buy-header__title').text
-    price = soup.select_one('.total-price').text.replace('원','').replace(',','')
-    imgUrl = "https:" + soup.select_one('.prod-image__detail')['src']
-
-    doc = {
-        'name': name, 
-        'price' : int(price),
-        'imgUrl' : imgUrl
+        'cookie': 'PCID=16724534648113966367288'
     }
-
+    data = requests.get(url, headers=headers, verify=False)
+    soup = BeautifulSoup(data.text, 'html.parser')
+    name = soup.select_one('.prod-buy-header__title').text
+    price = soup.select_one(
+        '.total-price').text.replace('원', '').replace(',', '')
+    imgUrl = "https:" + soup.select_one('.prod-image__detail')['src']
+    doc = {
+        'category': category,
+        'name': name,
+        'price': int(price),
+        'imgUrl': imgUrl,
+        'catetory': category,
+        'count': count,
+        'likes': 0,
+        'buyer': [],
+    }
     db.product.insert_one(doc)
     print(name, price, imgUrl)
 
+
 if __name__ == '__main__':
-   app.run('0.0.0.0',port=5000,debug=True)
+    app.run('0.0.0.0', port=5000, debug=True)

@@ -4,9 +4,9 @@ head %} {{ super() }}
   $(document).ready(function () {
     showGroup();
   });
+
   // 상품 카테고리 보여주기
   function showGroup() {
-    // all db name을 가져와서, for문으로 id #product-category에 append.
     $.ajax({
       type: "GET",
       url: "/group-list",
@@ -15,20 +15,20 @@ head %} {{ super() }}
         all_group = response["result"];
         for (let i = 0; i < all_group.length; i++) {
           let temp_html = `
-                    <div type="button" onclick="showList('${all_group[i]}')" class="btn btn-primary d-inline-flex">${all_group[i]}
-                        <span class="close" onclick="deleteField(event)">
-                            <i class="gg-close-my"></i>
-                        </span>
-                    </div>`;
+                        <div type="button" onclick="showList('${all_group[i]}')" class="btn btn-primary d-inline-flex">${all_group[i]}
+                            <span class="close" onclick="deleteField(event)">
+                                <i class="gg-close-my"></i>
+                            </span>
+                        </div>`;
           $("#product-category").append(temp_html);
         }
-    })
-}
+      },
+    });
+  }
 
-
-function showList(category) {
-    $('#item-name').html(category)
-    $('#list-box').empty()
+  function showList(category) {
+    $("#item-name").html(category);
+    $("#list-box").empty();
 
     $.ajax({
       type: "GET",
@@ -51,33 +51,33 @@ function showList(category) {
   // likes 부분 CSS 설정하기
   function makeCard(name, price, imgUrl, count, likes) {
     let temp = `
-                    <li class="card-content list-group-item">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <image class="product-image" src=${imgUrl}>
-                            <div class="ms-2 me-auto">
-                                <div class="fw-bold">${name}</div>
-                                    <p>가격: ${price}원</p>
-                                    <p>평점수: ${count}</p>
-                            </div>
-                            <span class="badge bg-primary rounded-pill">${likes}</span>
-                        </div>
-                        <footer class="card-footer">
-                            <a class="card-footer-item has-text-info" onclick="likeit('${name}')">
-                                좋아요!
-                                <span class="icon">
-                                    <i class="fa fa-thumbs-up fa-lg"></i>
-                                </span>
-                            </a>
-                            <a class="card-footer-item has-text-danger" onclick="dislike('${name}')">
-                                싫어요!
-                                <span class="icon">
-                                    <i class="fa fa-thumbs-down fa-lg"></i>
-                                </span>
-                            </a>
-                        </footer>
-                    </li>`;
+                      <li class="card-content list-group-item">
+                          <div class="d-flex justify-content-between align-items-start">
+                              <image class="product-image" src=${imgUrl}>
+                              <div class="ms-2 me-auto">
+                                  <div class="fw-bold">${name}</div>
+                                      <p>가격: ${price}원</p>
+                                      <p>평점수: ${count}</p>
+                              </div>
+                          </div>
+                          <footer class="card-footer">
+                              <a class="card-footer-item has-text-info" onclick="likeit('${name}')">
+                                  좋아요!
+                                  <span class="icon">
+                                      <i class="fa fa-thumbs-up fa-lg"></i>
+                                  </span>
+                              </a>
+                              <a class="card-footer-item has-text-danger" onclick="dislike('${name}')">
+                                  싫어요!
+                                  <span class="icon">
+                                      <i class="fa fa-thumbs-down fa-lg"></i>
+                                  </span>
+                              </a>
+                          </footer>
+                      </li>`;
     $("#list-box").append(temp);
   }
+
   function submitLink() {
     // url ajaxPOST 요청.
     let url = $("#url").val();
@@ -143,10 +143,14 @@ function showList(category) {
     >
   </p>
 </div>
+
 <div class="list" id="product-category"></div>
+{% import 'slides.html' as slides %}
+{{slides.slides(recommend_product_info.name, recommend_product_info.price,
+recommend_product_info.count, recommend_product_info.imgUrl)}}
 <div class="list" id="list-box"></div>
 <ol class="list-group list-group-numbered">
   <!-- showCards -->
-
-  {% endblock %}
 </ol>
+
+{% endblock %}
