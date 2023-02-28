@@ -1,0 +1,46 @@
+{% extends "base.html" %} {% block title %}회원가입{% endblock %} {% block head
+%} {{ super() }}
+<script>
+  function signUp() {
+    let username = $("#username").val();
+    let email = $("#email").val();
+    let password = $("#password").val();
+    console.log(username, email);
+    $.ajax({
+      method: "POST",
+      url: "{{url_for('signup')}}",
+      data: {
+        username_give: username,
+        email_give: email,
+        password_give: password,
+      },
+      success: (response) => {
+        console.log(response);
+        console.log(username, email, password);
+      },
+    });
+  }
+</script>
+{% endblock %} {% block body %}
+<div>
+  <div class="mb-3">
+    <div class="mb-3">
+      <label for="username" class="form-label">이름</label>
+      <input type="text" class="form-control" id="username" />
+    </div>
+    <label for="email" class="form-label">이메일</label>
+    <input
+      type="email"
+      class="form-control"
+      id="email"
+      aria-describedby="emailHelp"
+    />
+  </div>
+  <div class="mb-3">
+    <label for="password" class="form-label">비밀번호</label>
+    <input type="password" class="form-control" id="password" />
+  </div>
+
+  <button onClick="signUp()" class="btn btn-primary">회원가입</button>
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "base.html" %} {% block title %}로그인{% endblock %} {% block head %}
+{{ super() }}
+<script>
+  function logIn() {
+    let email = $("#email").val();
+    let password = $("#password").val();
+    console.log(password, email);
+    $.ajax({
+      method: "POST",
+      url: "{{url_for('login')}}",
+      data: {
+        email_give: email,
+        password_give: password,
+      },
+      statusCode: {
+        400: (res) => {
+          alert(res.responseText);
+        },
+      },
+      success: (response) => {
+        console.log(response);
+      },
+    });
+  }
+</script>
+{% endblock %} {% block body %}
+<div>
+  <div class="mb-3">
+    <label for="email" class="form-label">이메일</label>
+    <input
+      type="email"
+      class="form-control"
+      id="email"
+      aria-describedby="emailHelp"
+    />
+  </div>
+  <div class="mb-3">
+    <label for="password" class="form-label">비밀번호</label>
+    <input type="password" class="form-control" id="password" />
+  </div>
+
+  <button onClick="logIn()" class="btn btn-primary">로그인</button>
+</div>
+{% endblock %}
