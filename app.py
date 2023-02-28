@@ -25,7 +25,6 @@ db = client.dbsparta
 
 ## 메인페이지
 @app.route('/')
-@jwt_required(optional=True)
 def home():
    return render_template('index.html')
 
@@ -33,6 +32,8 @@ def home():
 @app.route('/login')
 def loginView():
     return render_template('login.html')
+
+
 
 @app.route('/token/auth', methods=['POST'])
 def login(): 
@@ -57,10 +58,6 @@ def login():
     return resp, 200
     
 
-@app.route('/detail', methods=['GET'])
-@jwt_required
-def detailPageView():
-    return render_template('detail.html')
 
 @app.route('/protected', methods=['GET'])
 @jwt_required
@@ -70,11 +67,12 @@ def detailPage():
 
 
 
-#회원가입
+#회원가입 뷰
 @app.route('/signup', methods=['GET'])
 def signupView():
     return render_template('signUp.html')
 
+##api
 @app.route('/signup', methods=['POST'])
 def signup():
     username = request.form['username_give']
@@ -90,11 +88,22 @@ def signup():
     if email == checkExistEmail:
         return '존재하는 이메일입니다.', 400
     
-@app.route('/show', methods=['GET'])
-def show_group():
-    result = list(db.product.find({}, {'_id':0}))
-    # print(result)
-    return jsonify({'lists': result})
+@app.route('/group-list', methods=['GET'])
+def show_group_category():
+    all_group = db.list_collection_names()
+    print(all_group)
+    return jsonify({'result': all_group})
+
+
+@app.route('/list', methods=['GET'])
+def show_products():
+    keyword = request.args.get('keyword')
+    products = list(db[keyword].find({}, {'_id':False}).sort('likes', -1))
+    print(products)
+
+    return jsonify({'lists': products})
+
+
 
 # 입력받은 쿠팡 ulr로 데이터 DB에 넣기
 @app.route('/submit', methods=['POST'])
