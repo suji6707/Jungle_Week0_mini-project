@@ -83,7 +83,7 @@ function makeCard(name, price, imgUrl, count, likes) {
                     </footer>
                 </li>`;
 
-    $('#item-name').append(temp)
+    $('#list-box').append(temp)
 }
 
 
@@ -135,13 +135,13 @@ function submitLink() {
                 </select>
             </div>
             <input type="text" class="form-control" id="count" placeholder="모집인원을 입력하세요" />
-
-
         </div>        
         <p class="lead">
         <a onclick="submitLink()" class="btn btn-primary btn-lg" href="#" role="button">링크 등록</a>
         </p>
     </div>
+
+    <div class="list" id="product-category"></div>
 
     <div class="list" id="list-box">
     <ol class="list-group list-group-numbered">
