@@ -80,25 +80,3 @@ if __name__ == '__main__':
 
 
 
-# 웹 스크래핑 TEST
-# url = 'https://www.coupang.com/vp/products/4550236145?itemId=12725041643&vendorItemId=84999675267&q=%EC%BB%A4%ED%94%BC%EB%AF%B9%EC%8A%A4&itemsCount=36&searchId=831f6f55a7e44a87b9b6d4711fbc6632&rank=0&isAddedCart='
-
-# headers = {
-#     'user-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
-#     'sec-ch-ua' : '"Not_A Brand";v="99", "Google Chrome";v="109", "Chromium";v="109"',
-#     'sec-ch-ua-mobile': '?0',
-#     'sec-ch-ua-platform': '"Windows"',
-#     'cookie': 'PCID=16724534648113966367288; MARKETID=16724534648113966367288; X-CP-PT-locale=ko_KR; _fbp=fb.1.1672453465705.1131102584; gd1=Y; _ga=GA1.2.1134491595.1674487494; x-coupang-origin-region=KOREA; x-coupang-target-market=KR; sid=18882f29d5ae4c42980b569293359d2b2e194494; bm_sz=ADF76A16FF5AE717392CABEAC96B12EF~YAAQBqPBF/++p1aGAQAAD8P9kRI3/Rt+T/TAfNZSkvuwT3thQ6tnV8fXCCGvHVx7wae0msKB+FBzVk3hvjNsnRfzuo06ODHyIcR1q5V5DdChPRbNf5UWEUgiQk/oJk6bF75DOR/CPCgZ356N5qBlC7DvSPNyM+7AtPk+T/shk+5GduwSOrkfqmsOtyfsnn3h1wuT+SB6NTgcmDEWX7t4A6jqaQWFk5Njj2QXT/ZNcpPVW8fbl1o6GwmEZpHTjKkcFmaPUGLqPkGfftBSUAJqrCUf4RU2qUi3Wf+/y+C7LRWqQODw~3294003~4342584; trac_src=1042016; trac_spec=10304903; trac_addtag=900; trac_ctag=HOME; trac_lptag=%EC%BF%A0%ED%8C%A1; FUN="{\'search\':[{\'reqUrl\':\'/search.pang\',\'isValid\':true}]}"; bm_mi=8DBE51F90E69DC025E5D4F1019196C7E~YAAQJ3pGaC8lnzOGAQAA++CHkhIT5OW6gdNyjc0MMbG4a5EqdhrsBjm9ar/hqjaX3AfNhlbH28DdbcAJZlc/120lAeKXkXgqT7yZjZA/U4TPJbOUXcsVltmmd9keKF9LZ6a/UoWaXjb00ryElkaWVobCQMB2ig+ONB67qRzW1cs1PKApX9JUPtL+3jPzQfqIvfyzRZALbnU1RUm0Jd2eQ2bkD/ZOWmLgTI5STmdK+8GH2GKKswqi1noOx+WPW9Bb2A+ZmhkT58dm5aUPX7I5FSdliyOieiaro5CgGX7/kIF7YkNbk6nzW41MZ8MTs1eYaOiXwqXdbDBGm7qwokSNCJ0Uw3g=~1; ak_bmsc=0D453390AB4E3D69D8D57471097D30BF~000000000000000000000000000000~YAAQJ3pGaJwlnzOGAQAAFeeHkhL2nI0OR2B6qghIQjJve7/jETqJzD/gkqlKf6iBw/+aOwB+JQDKWjXMCFQfR+nZAd2siwy0H9xBDjDmN6F64RwXJo7O7WUtrxMkFiloqOHIDh/65Y3WtElkiz0ETXHO9GNdZ5nPYXvlBzzp+TEtsc5uwY0yXOm2JZ7zLzFDEHvuvheDa7pLp1BCFmcacWqTOuukS6TgWn+wWc3+fVMnldtvWc+zRmkqO3QsoKaAxfgOBOl0L8qSB20eGF8XOi+o5Q5/JoFCkM72Y28ykMGhx/J+VoiPd1r8jmO+N4BaWQtF5xuQ6EOdDyHng+bMzzF7J/kou1+wePuiuysmdLuuaZdnfJqeTM++nfd1ppMlfxCtyphstdDDeKGvYV/6Cx5utrkjwhj3NsXKkSXhqt6a6O2s4AImGKtOtvTkvzFG4OWTBRs=; trac_itime=20230227204223; overrideAbTestGroup=%5B%5D; searchKeyword=%EC%8B%9D%EB%B9%B5%7C%EB%94%B8%EA%B8%B0%EC%9E%BC%7C%EC%BB%A4%ED%94%BC%7C%EC%BB%A4%ED%94%BC%EB%AF%B9%EC%8A%A4; searchKeywordType=%7B%22%EC%8B%9D%EB%B9%B5%22%3A0%7D%7C%7B%22%EB%94%B8%EA%B8%B0%EC%9E%BC%22%3A0%7D%7C%7B%22%EC%BB%A4%ED%94%BC%22%3A0%7D%7C%7B%22%EC%BB%A4%ED%94%BC%EB%AF%B9%EC%8A%A4%22%3A0%7D; _abck=DF13EA24D5308A4D1C9C54E04D8E63E7~0~YAAQRTMtFzmrmDSGAQAAX0DCkgk6kkemtNIKLXrBAsinqL/2J3jsb9ls0uzexYuRuTo+1qWmf7wRStvbl1QMj49pSMYLM81JKQJsAwA8YdpnDTpq8wAaeuCPrfTuGuLQXm/jaAY2pZWgl0ppcg7jonmRUVJmV1+MeTfkQI6FfoPuKefsB52WF9BFu4QamNv4lSRXF9cMzN1wf16D6JxOmogisFmE8keSz2S35yqydQjZ+yWy5SlNM7W2o0Kt4EMEPvnOMcKGYSCEnMcSS6RjE/Nmn9ZR4asUn9VQ1k88nDXtjWIwz9Wupb765EKKvPdeuvwqRPef/HhnQdgpGUcB2Y2ldR7iluecFwniN4k3VuxDelZWcpRDgXvaXcS1HEmIegOszPPgqdjAVvOxrBOuONb+uGNtJOTUZnMsmoa0QQjHLHs9UrSt~-1~-1~-1; x-coupang-accept-language=ko_KR; cto_bundle=WtO5E19Gb2lwUjE4R2dHR0Z6cXFlM3M2a3QxczhJRjFSQzhzdUU5V01HZlV5WUszVTc5NWNLOGg1RzJHWSUyQjdhSVVsR1p4ZXRxVSUyQnFJbXlDUElqd0NvU1BnM01mUzlNMlJwU3M2VnMxOFFBJTJCZkhraDdlNDF6RDF6NjklMkZSUnRmTURTN2gzRThtSjVpNjBSS0NTY3RJaGtpMnQ2USUzRCUzRA; bm_sv=38CF9C3659D898F7B451193E3FB9F0D5~YAAQRTMtF5GrmDSGAQAAAV7CkhI47fPUIc5VdVShvfLyyZHnJlqKuA1H/QtXdKJ7kHuMFuRasBAMrXwzUPED4+UP/ZS1ePZjL4K2GFnQkGy8lF0WzUKJPP4jw+6lMTWlHx+TBDGpBBlPDmU5k4e9fr+dLaNNKJVnL4pByrS84uYcKZVit+C+Jx2VDsVxT+6j7xDEMazYgca/kj74qSUb/2SwM1a8QWlPAYLAFSU2r7En+rro1Ll0Gdz1ALQgD+AA7I0=~1; baby-isWide=wide'
-#     }
-
-# data = requests.get(url, headers = headers, verify=False)
-
-# soup = BeautifulSoup(data.text, 'html.parser')
-
-# name = soup.select_one('.prod-buy-header__title').text
-# price = soup.select_one('.total-price').text.replace('원','').replace(',','')
-# imgUrl = "https:" + soup.select_one('.prod-image__detail')['src']
-
-# print(name, price, imgUrl)
-
-

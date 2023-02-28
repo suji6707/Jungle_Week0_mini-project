@@ -4,10 +4,9 @@
   function logIn() {
     let email = $("#email").val();
     let password = $("#password").val();
-    console.log(password, email);
     $.ajax({
       method: "POST",
-      url: "{{url_for('login')}}",
+      url: "/token/auth",
       data: {
         email_give: email,
         password_give: password,
@@ -18,7 +17,7 @@
         },
       },
       success: (response) => {
-        console.log(response);
+        window.location.href = "http://localhost:5000/";
       },
     });
   }

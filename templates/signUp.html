@@ -14,9 +14,15 @@
         email_give: email,
         password_give: password,
       },
+      statusCode: {
+        400: (res) => {
+          alert(res.responseText);
+        },
+      },
       success: (response) => {
-        console.log(response);
-        console.log(username, email, password);
+        if (response.msg === "success") {
+          window.location.href = "http://localhost:5000/login";
+        }
       },
     });
   }

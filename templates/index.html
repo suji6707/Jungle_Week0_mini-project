@@ -1,9 +1,9 @@
 {% extends "base.html" %} {% block title %}메인페이지{% endblock %} {% block
 head %} {{ super() }}
 <script>
-$(document).ready(function () {
+  $(document).ready(function () {
     showGroup();
-})
+  });
 
 // 상품 카테고리 보여주기
 function showGroup() {
@@ -81,7 +81,7 @@ function makeCard(name, price, imgUrl, count, likes) {
                             </span>
                         </a>
                     </footer>
-                </li>`
+                </li>`;
 
     $('#item-name').append(temp)
 }
@@ -143,21 +143,8 @@ function submitLink() {
         </p>
     </div>
 
-    <div class="main-bg">
-        <h1 class="main-title">상품 카테고리</h1>
-        <div class="product-group" id="product-category">
-            <!-- buttons -->
-        </div>
-    </div>
-
-    <div class="item-name" id="item-name">
-    <!-- 상품이름 html 조작 -->
-
-    <div class="list" id="product-list">
+    <div class="list" id="list-box">
     <ol class="list-group list-group-numbered">
     <!-- showCards -->
-
-
-
 </p>
 {% endblock %}
