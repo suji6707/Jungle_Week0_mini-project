@@ -1,22 +1,38 @@
 {% extends "base.html" %} {% block title %}로그인{% endblock %} {% block head %}
-{{ super() }} {% endblock %} {% block body %}
+{{ super() }}
+<script>
+  function addToBuyer(user, name) {
+    $.ajax({
+      url: "/add-to-buyer",
+      method: "POST",
+      data: { user_give: user, name_give: name },
+      success: (res) => {
+        console.log(res);
+      },
+    });
+  }
+</script>
+{% endblock %} {% block body %}
 <div class="row">
   <div class="col-md-6">
-    <img src="https://via.placeholder.com/300" class="img-fluid" />
+    <img src="{{product_info.imgUrl}}" class="img-fluid" />
   </div>
   <div class="col-md-6">
-    <h2>Product Name</h2>
-    <p>Description of product goes here.</p>
-    <p><strong>Price:</strong> $10.00</p>
-    <button class="btn btn-primary">Add to Cart</button>
+    <h2>{{product_info.name}}</h2>
+    <p><strong>Price:</strong> {{product_info.price}}</p>
+    <button
+      onClick="addToBuyer('{{current_user|safe}}', '{{product_info.name}}')"
+      class="btn btn-primary"
+    >
+      참여하기
+    </button>
   </div>
   <h1>참여자 목록</h1>
+
   <ul class="list-group">
-    <li class="list-group-item">Cras justo odio</li>
-    <li class="list-group-item">Dapibus ac facilisis in</li>
-    <li class="list-group-item">Morbi leo risus</li>
-    <li class="list-group-item">Porta ac consectetur ac</li>
-    <li class="list-group-item">Vestibulum at eros</li>
+    {% for buyer in product_info.buyer %}
+    <li class="list-group-item">{{buyer}}</li>
+    {% endfor%}
   </ul>
 </div>
 {% endblock %}

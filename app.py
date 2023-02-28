@@ -13,8 +13,8 @@ from bs4 import BeautifulSoup
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = "secret"
 app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
-app.config['JWT_ACCESS_COOKIE_PATH'] = '/api/'
-app.config['JWT_REFRESH_COOKIE_PATH'] = '/token/refresh'
+app.config['JWT_ACCESS_COOKIE_PATH'] = '/'
+app.config['JWT_REFRESH_COOKIE_PATH'] = '/'
 
 jwt = JWTManager(app)
 bcrypt = Bcrypt(app)
@@ -29,7 +29,7 @@ def home():
     test = db.product.find_one({'category': 'necessity'})
     recommend_product_info = {'category': test['category'], 'name': test['name'], 'price': str(
         test['price']), 'imgUrl': test['imgUrl'], 'count': test['count'], 'likes': str(test['likes']), 'buyer': test['buyer']}
-    return render_template('index.html', recommend_product_info=recommend_product_info, a={"a": '0'})
+    return render_template('index.html')
 
 # 로그인
 
@@ -60,28 +60,21 @@ def login():
     resp = jsonify({'login': True})
     set_access_cookies(resp, access_token)
     set_refresh_cookies(resp, refresh_token)
-    return resp, 200
+    return resp
 
 
-@app.route('/protected', methods=['GET'])
-@jwt_required
-def detailPage():
+@app.route('/detail/<variable>', methods=['GET'])
+@jwt_required()
+def detailPage(variable):
     current_user = get_jwt_identity()
-    return jsonify(logged_in_as=current_user), 200
+    product_info = db.product.find_one({'name': variable}, {'_id': 0})
+    return render_template('detail.html', current_user=current_user, product_info=product_info), 200
 
 
-@app.route('/detail')
-def detailView():
-    return render_template('detail.html')
-
-# 회원가입 뷰
-
-
+# 회원가입
 @app.route('/signup', methods=['GET'])
 def signupView():
     return render_template('signUp.html')
-
-# api
 
 
 @app.route('/signup', methods=['POST'])
@@ -100,6 +93,17 @@ def signup():
 
     if email == checkExistEmail:
         return '존재하는 이메일입니다.', 400
+
+# 참여하기 추가
+
+
+@app.route('/add-to-buyer', methods=['POST'])
+def addToBuyer():
+    participateUser = request.form['user_give']
+    product_name = request.form['name_give']
+    db.product.find_one_and_update(
+        {'name': product_name}, {'$push': {'buyer': participateUser}})
+    return jsonify({'msg': 'success'})
 
 
 @app.route('/group-list', methods=['GET'])

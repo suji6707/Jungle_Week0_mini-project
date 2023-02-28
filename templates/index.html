@@ -52,12 +52,13 @@ head %} {{ super() }}
   function makeCard(name, price, imgUrl, count, likes) {
     let temp = `
                       <li class="card-content list-group-item">
+                        <a href='/detail/${name}'>
                           <div class="d-flex justify-content-between align-items-start">
                               <image class="product-image" src=${imgUrl}>
                               <div class="ms-2 me-auto">
                                   <div class="fw-bold">${name}</div>
                                       <p>가격: ${price}원</p>
-                                      <p>평점수: ${count}</p>
+                                      <p>모집인원: ${count}</p>
                               </div>
                           </div>
                           <footer class="card-footer">
@@ -74,6 +75,7 @@ head %} {{ super() }}
                                   </span>
                               </a>
                           </footer>
+                        </a>
                       </li>`;
     $("#list-box").append(temp);
   }
@@ -145,9 +147,6 @@ head %} {{ super() }}
 </div>
 
 <div class="list" id="product-category"></div>
-{% import 'slides.html' as slides %}
-{{slides.slides(recommend_product_info.name, recommend_product_info.price,
-recommend_product_info.count, recommend_product_info.imgUrl)}}
 <div class="list" id="list-box"></div>
 <ol class="list-group list-group-numbered">
   <!-- showCards -->
