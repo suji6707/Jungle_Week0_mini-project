@@ -32,8 +32,7 @@ function showGroup() {
 
 function showList(category) {
     $('#item-name').html(category)
-    //$('#product-list').empty()
-    // if fruit console.log(과일/채소)
+    $('#list-box').empty()
 
     $.ajax({
         type: "GET",
@@ -114,7 +113,7 @@ function submitLink() {
 </script>
 
 {% endblock %} {% block body %}
-<p>
+
     <div class="jumbotron">
         <h1 class="display-4">관심상품 등록하기</h1>
         <p class="lead">관심있는 상품을 등록하고 공동구매를 하는 공간입니다!</p>     
@@ -143,8 +142,8 @@ function submitLink() {
 
     <div class="list" id="product-category"></div>
 
-    <div class="list" id="list-box">
+    <div class="list" id="list-box"></div>
     <ol class="list-group list-group-numbered">
     <!-- showCards -->
-</p>
+
 {% endblock %}
