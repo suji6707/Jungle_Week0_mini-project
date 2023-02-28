@@ -1,29 +1,25 @@
 {% extends "base.html" %} {% block title %}메인페이지{% endblock %} {% block
 head %} {{ super() }}
 <script>
-$(document).ready(function () {
+  $(document).ready(function () {
     showGroup();
-})
+  });
 
-function showGroup() {
+  function showGroup() {
     $.ajax({
-        method: "GET",
-        url: "/show",
-        data: {},
-        success: function(response) {
-            let lists = response['lists'];
-            for(let i = 0; i < lists.length; i++) {
-                makeCard(lists[i]['name'],
-                        lists[i]['price'],
-                        lists[i]['imgUrl']        
-                )
-            }
+      method: "GET",
+      url: "/show",
+      data: {},
+      success: function (response) {
+        let lists = response["lists"];
+        for (let i = 0; i < lists.length; i++) {
+          makeCard(lists[i]["name"], lists[i]["price"], lists[i]["imgUrl"]);
         }
-    })
-}
+      },
+    });
+  }
 
-
-function makeCard(name, price, imgUrl) {
+  function makeCard(name, price, imgUrl) {
     let temp = `
                 <li class="card-content list-group-item">
                     <div class="d-flex justify-content-between align-items-start">
@@ -48,48 +44,55 @@ function makeCard(name, price, imgUrl) {
                             </span>
                         </a>
                     </footer>
-                </li>`
+                </li>`;
 
-    $('#list-box').append(temp)
-}
+    $("#list-box").append(temp);
+  }
 
-
-function submitLink() {
-    // url ajaxPOST 요청. 
-    let url = $('#url').val()
+  function submitLink() {
+    // url ajaxPOST 요청.
+    let url = $("#url").val();
 
     $.ajax({
-        method: "POST",
-        url: '/submit',
-        data: {'url' : url},
-        success: function (response) {
-                    if (response['return'] == 'success') {
-                        alert('저장 완료!')
-                        window.location.reload();
-                    }
-                }
-    })
-}
-
-
+      method: "POST",
+      url: "/submit",
+      data: { url: url },
+      success: function (response) {
+        if (response["return"] == "success") {
+          alert("저장 완료!");
+          window.location.reload();
+        }
+      },
+    });
+  }
 </script>
 
 {% endblock %} {% block body %}
-<p>
-    <div class="jumbotron">
-        <h1 class="display-4">관심상품 등록하기</h1>
-        <p class="lead">관심있는 상품을 등록하고 공동구매를 하는 공간입니다!</p>     
-        <div class="form-group">
-            <input type="text" class="form-control" id="url" 
-            placeholder="상품명을 입력하세요" />
-        </div>        
-        <p class="lead">
-        <a onclick="submitLink()" class="btn btn-primary btn-lg" href="#" role="button">링크 등록</a>
-        </p>
-    </div>
+<div class="jumbotron">
+  <h1 class="display-4">관심상품 등록하기</h1>
+  <p class="lead">관심있는 상품을 등록하고 공동구매를 하는 공간입니다!</p>
+  <div class="form-group">
+    <input
+      type="text"
+      class="form-control"
+      id="url"
+      placeholder="상품명을 입력하세요"
+    />
+  </div>
+  <p class="lead">
+    <a
+      onclick="submitLink()"
+      class="btn btn-primary btn-lg"
+      href="#"
+      role="button"
+      >링크 등록</a
+    >
+  </p>
+</div>
 
-    <div class="list" id="list-box">
-    <ol class="list-group list-group-numbered">
+<div class="list" id="list-box">
+  <ol class="list-group list-group-numbered">
     <!-- showCards -->
-</p>
-{% endblock %}
+    {% endblock %}
+  </ol>
+</div>
