@@ -4,27 +4,23 @@ head %} {{ super() }}
   $(document).ready(function () {
     showGroup();
   });
-
-// 상품 카테고리 보여주기
-function showGroup() {
+  // 상품 카테고리 보여주기
+  function showGroup() {
     // all db name을 가져와서, for문으로 id #product-category에 append.
     $.ajax({
-        type: "GET",
-        url: "/group-list",
-        data: {},
-        success: function (response) {
-            all_group = response['result']
-
-            for (let i = 0; i < all_group.length; i++) {
-                let temp_html = `
-                <div type="button" onclick="showList('${all_group[i]}')" class="btn btn-primary d-inline-flex">${all_group[i]}
-                    <span class="close" onclick="deleteField(event)">
-                        <i class="gg-close-my"></i>
-                    </span>
-                </div>`
-
-                $('#product-category').append(temp_html)
-            }
+      type: "GET",
+      url: "/group-list",
+      data: {},
+      success: function (response) {
+        all_group = response["result"];
+        for (let i = 0; i < all_group.length; i++) {
+          let temp_html = `
+                    <div type="button" onclick="showList('${all_group[i]}')" class="btn btn-primary d-inline-flex">${all_group[i]}
+                        <span class="close" onclick="deleteField(event)">
+                            <i class="gg-close-my"></i>
+                        </span>
+                    </div>`;
+          $("#product-category").append(temp_html);
         }
     })
 }
@@ -35,115 +31,122 @@ function showList(category) {
     $('#list-box').empty()
 
     $.ajax({
-        type: "GET",
-        url: `/list?keyword=${category}`,
-        data: {},
-        success: function(response) {
-            let lists = response['lists'];
-            for(let i = 0; i < lists.length; i++) {
-                makeCard(lists[i]['name'],
-                        lists[i]['price'],
-                        lists[i]['imgUrl'],
-                        lists[i]['count'],
-                        lists[i]['likes']        
-                )
-            }
+      type: "GET",
+      url: `/list?keyword=${category}`,
+      data: {},
+      success: function (response) {
+        let lists = response["lists"];
+        for (let i = 0; i < lists.length; i++) {
+          makeCard(
+            lists[i]["name"],
+            lists[i]["price"],
+            lists[i]["imgUrl"],
+            lists[i]["count"],
+            lists[i]["likes"]
+          );
         }
-    })
-}
-
-// likes 부분 CSS 설정하기
-function makeCard(name, price, imgUrl, count, likes) {
-    
+      },
+    });
+  }
+  // likes 부분 CSS 설정하기
+  function makeCard(name, price, imgUrl, count, likes) {
     let temp = `
-                <li class="card-content list-group-item">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <image class="product-image" src=${imgUrl}>
-                        <div class="ms-2 me-auto">
-                            <div class="fw-bold">${name}</div>
-                                <p>가격: ${price}원</p>
-                                <p>평점수: ${count}</p>
+                    <li class="card-content list-group-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <image class="product-image" src=${imgUrl}>
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">${name}</div>
+                                    <p>가격: ${price}원</p>
+                                    <p>평점수: ${count}</p>
+                            </div>
+                            <span class="badge bg-primary rounded-pill">${likes}</span>
                         </div>
-                        <span class="badge bg-primary rounded-pill">${likes}</span>
-                    </div>
-                    <footer class="card-footer">
-                        <a class="card-footer-item has-text-info" onclick="likeit('${name}')">
-                            좋아요!
-                            <span class="icon">
-                                <i class="fa fa-thumbs-up fa-lg"></i>
-                            </span>
-                        </a>
-                        <a class="card-footer-item has-text-danger" onclick="dislike('${name}')">
-                            싫어요!
-                            <span class="icon">
-                                <i class="fa fa-thumbs-down fa-lg"></i>
-                            </span>
-                        </a>
-                    </footer>
-                </li>`;
-
-    $('#list-box').append(temp)
-}
-
-
-function submitLink() {
-    // url ajaxPOST 요청. 
-    let url = $('#url').val();
-    let category = $('#category-id').val();
-    let count = $('#count').val();
-
+                        <footer class="card-footer">
+                            <a class="card-footer-item has-text-info" onclick="likeit('${name}')">
+                                좋아요!
+                                <span class="icon">
+                                    <i class="fa fa-thumbs-up fa-lg"></i>
+                                </span>
+                            </a>
+                            <a class="card-footer-item has-text-danger" onclick="dislike('${name}')">
+                                싫어요!
+                                <span class="icon">
+                                    <i class="fa fa-thumbs-down fa-lg"></i>
+                                </span>
+                            </a>
+                        </footer>
+                    </li>`;
+    $("#list-box").append(temp);
+  }
+  function submitLink() {
+    // url ajaxPOST 요청.
+    let url = $("#url").val();
+    let category = $("#category-id").val();
+    let count = $("#count").val();
     $.ajax({
-        type: "POST",
-        url: '/submit',
-        data: {
-            'url' : url,
-            'category' : category,
-            'count' : count
-        },
-        success: function (response) {
-                    if (response['return'] == 'success') {
-                        alert('저장 완료!')
-                        window.location.reload();
-                    }
-                }
-    })
-}
-
-
+      type: "POST",
+      url: "/submit",
+      data: {
+        url: url,
+        category: category,
+        count: count,
+      },
+      success: function (response) {
+        if (response["return"] == "success") {
+          alert("저장 완료!");
+          window.location.reload();
+        }
+      },
+    });
+  }
 </script>
-
 {% endblock %} {% block body %}
 
-    <div class="jumbotron">
-        <h1 class="display-4">관심상품 등록하기</h1>
-        <p class="lead">관심있는 상품을 등록하고 공동구매를 하는 공간입니다!</p>     
-        <div class="form-group">
-            <input type="text" class="form-control" id="url" placeholder="상품 링크를 입력하세요" />
-            <div class="input-group mb-3">
-                <label class="input-group-text" for="size">카테고리</label>
-                <select class="form-select" id = "category-id">
-                    <option selected>-- 카테고리 --</option>
-                    <option value="fruit">과일/채소</option>
-                    <option value="bakery">간식/과자</option>
-                    <option value="drink">물/음료/커피</option>
-                    <option value="meal">간편식</option>
-                    <option value="necessity">생필품</option>
-                    <option value="clothes">섬유류</option>
-                    <option value="skincare">스킨케어</option>
-                    <option value="wash">비누/샴푸</option>
-                </select>
-            </div>
-            <input type="text" class="form-control" id="count" placeholder="모집인원을 입력하세요" />
-        </div>        
-        <p class="lead">
-        <a onclick="submitLink()" class="btn btn-primary btn-lg" href="#" role="button">링크 등록</a>
-        </p>
+<div class="jumbotron">
+  <h1 class="display-4">관심상품 등록하기</h1>
+  <p class="lead">관심있는 상품을 등록하고 공동구매를 하는 공간입니다!</p>
+  <div class="form-group">
+    <input
+      type="text"
+      class="form-control"
+      id="url"
+      placeholder="상품 링크를 입력하세요"
+    />
+    <div class="input-group mb-3">
+      <label class="input-group-text" for="size">카테고리</label>
+      <select class="form-select" id="category-id">
+        <option selected>-- 카테고리 --</option>
+        <option value="fruit">과일/채소</option>
+        <option value="bakery">간식/과자</option>
+        <option value="drink">물/음료/커피</option>
+        <option value="meal">간편식</option>
+        <option value="necessity">생필품</option>
+        <option value="clothes">섬유류</option>
+        <option value="skincare">스킨케어</option>
+        <option value="wash">비누/샴푸</option>
+      </select>
     </div>
+    <input
+      type="text"
+      class="form-control"
+      id="count"
+      placeholder="모집인원을 입력하세요"
+    />
+  </div>
+  <p class="lead">
+    <a
+      onclick="submitLink()"
+      class="btn btn-primary btn-lg"
+      href="#"
+      role="button"
+      >링크 등록</a
+    >
+  </p>
+</div>
+<div class="list" id="product-category"></div>
+<div class="list" id="list-box"></div>
+<ol class="list-group list-group-numbered">
+  <!-- showCards -->
 
-    <div class="list" id="product-category"></div>
-
-    <div class="list" id="list-box"></div>
-    <ol class="list-group list-group-numbered">
-    <!-- showCards -->
-
-{% endblock %}
+  {% endblock %}
+</ol>
