@@ -20,25 +20,32 @@
 
   // 상품 카테고리 보여주기
   function showGroup() {
-    let all_group = [
-      "fruit",
-      "bakery",
-      "drink",
-      "meal",
-      "necessity",
-      "clothes",
-      "skincare",
-      "wash",
-    ];
+    let categoryDict = {
+      "fruit": ["과일/채소", "https://imgur.com/0Yn0Y2K.png"],
+      "bakery": ["간식/과자", "https://imgur.com/0TNaDbu.png"],
+      "drink": ["물/음료", "https://imgur.com/aRdzizE.png"],
+      "meal": ["간편식", "https://imgur.com/r8a400S.png"],
+      "necessity": ["생필품", "https://imgur.com/8uJ5dEL.png"],
+      "clothes": ["섬유류", "https://imgur.com/9AclHKx.png"],
+      "skincare": ["스킨케어", "https://imgur.com/c7e9Ic8.png"],
+      "wash": ["비누/샴푸", "https://imgur.com/nMW7tBt.png"]
+    };
 
-    for (i = 0; i < all_group.length; i++) {
+    let all_group = Object.keys(categoryDict);
+    let categoryBtns = Object.values(categoryDict);
+
+    console.log(all_group)
+
+    for (i=0; i<all_group.length; i++) {
+      console.log(all_group[i], categoryBtns[i])
+
+
       let temp_html = `
-            <div type="button" onclick="showList('${all_group[i]}')" class="btn btn-primary d-inline-flex">${all_group[i]}
-                <span class="close" onclick="deleteField(event)">
-                    <i class="gg-close-my"></i>
-                </span>
-            </div>`;
+      <div class = "d-inline-flex flex-column">
+        <img src="${categoryBtns[i][1]}" style= size:30px >
 
+        <div type="button" onclick="showList('${all_group[i]}')" class="btn d-inline-flex">${categoryBtns[i][0]}</div>
+      </div>`  
         $("#product-category").append(temp_html);
       }
     }
@@ -146,14 +153,14 @@
   display: flex, inline;
   flex-wrap: wrap;
   justify-content: space-between;
-  width: 100%;
+  width: 900px;
   position: relative;
   padding:1em;
 }
 
 #product-category > button {
-  margin: 10px;
-  flex: 50%;
+  margin: 50px;
+  padding:30px;
   box-shadow: 0 0 0 1px black;
   margin-bottom: 10px;
 }
@@ -165,17 +172,18 @@
 
 
 
-<!-- 카테고리 그룹 2 row로 분리 -->
+<!-- 카테고리 그룹 -->
 <div class="flex-container wrap" id="product-category"></div>
 
-<!-- 카테고리 그룹 -->
-<div class="list" id="product-category"></div>
+
 {% import 'slides.html' as slides %} {{slides.slides(recommend_product_info)}}
 
 <!-- 마감임박 리스트 -->
 
 <!-- 해당 카테고리 -->
 <div class="item-name" id="item-name"></div>
+
+
 <!-- 상품리스트 -->
 <div class="list" id="list-box"></div>
 <ol class="list-group list-group-numbered">
