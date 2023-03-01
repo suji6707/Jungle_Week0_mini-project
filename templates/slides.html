@@ -1,42 +1,47 @@
 {% macro slides(recommend_product_info) -%}
-<div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
-  <ol class="carousel-indicators">
-    <li data-target="#carouselExampleIndicators" data-slide-to="0"></li>
-    <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
-    <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
-  </ol>
-  <div class="carousel-inner">
-    {% for product in recommend_product_info %} {{ cards(name=product.name,
-    price=product.price, count=product.count, imgUrl=product.imgUrl) }} {%
-    endfor %}
-  </div>
+<div
+  id="carouselExampleIndicators"
+  class="carousel slide d-flex align-items-center"
+  data-ride="carousel"
+  style="width: 600px"
+>
   <button
     id="carousel-control-prev"
+    class="btn btn-primary btn-sm"
     href="#carouselExampleIndicators"
     data-slide="prev"
   >
     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
     <span class="sr-only">Previous</span>
   </button>
+  <div class="carousel-inner">
+    {% for product in recommend_product_info %} {{ cards(name=product.name,
+    price=product.price, count=product.count, imgUrl=product.imgUrl,
+    buyerCount=product.buyerCount) }} {% endfor %}
+  </div>
   <button
     id="carousel-control-next"
     href="#carouselExampleIndicators"
+    class="btn btn-primary btn-sm"
     data-slide="next"
   >
     <span class="carousel-control-next-icon" aria-hidden="true"></span>
     <span class="sr-only">Next</span>
   </button>
 </div>
-{%- endmacro %} {% macro cards(name, price, count, imgUrl) %}
+{%- endmacro %} {% macro cards(name, price, count, imgUrl, buyerCount) %}
 <div class="carousel-item">
-  <div class="d-flex justify-content-between align-items-start p-3">
-    <image class="product-image" src="{{imgUrl}}" />
-    <div class="ms-2 me-auto">
-      <div class="fw-bold">{{name}}</div>
-      <p>가격: {{price}}원</p>
-      <p>모집인원: {{count}}</p>
+  <a href="/detail/{{name}}" class="text-reset">
+    <div class="d-flex justify-content-center align-items-start p-3">
+      <image class="product-image" src="{{imgUrl}}" />
+      <div class="ms-2 me-auto">
+        <div class="fw-bold">{{name}}</div>
+        <p>가격: {{price}}원</p>
+        <p>모집인원: {{count}}명</p>
+        <p class="text-danger">참여인원: {{buyerCount}}명</p>
+      </div>
+      <span class="badge bg-primary rounded-pill">{{likes}}</span>
     </div>
-    <span class="badge bg-primary rounded-pill">{{likes}}</span>
-  </div>
+  </a>
 </div>
 {%- endmacro %}

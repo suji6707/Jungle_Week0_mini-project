@@ -30,41 +30,6 @@
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <title>{% block title %}{% endblock %}</title>
     {% endblock %}
-  </head>
-  <body>
-    <header>
-      <div class="banner">
-        <div class="goHomepage" onclick="location.href='/'">
-          <h1>Welcome to Campus Group Buying</h1>
-          <p>관심있는 상품을 등록하고 공동구매를 하는 공간입니다!</p>
-        </div>
-        <button
-          type="button"
-          class="btn btn-dark btn-lg"
-          id="register-button"
-          onClick="location.href='/register'"
-        >
-          상품 등록하러 가기
-        </button>
-      </div>
-
-      <div class="topnav">
-        <div class="login-container">
-          {% if session.username %}
-          <div class="d-flex align-items-center">
-            <span class="p-3">{{username}}</span>
-            <button type="submit">로그아웃</button>
-          </div>
-          {% else %}
-          <button type="submit" onClick="location.href='signup'">
-            회원가입
-          </button>
-          <button type="submit" onClick="location.href='login'">로그인</button>
-          {% endif %}
-        </div>
-      </div>
-    </header>
-
     <style>
       * {
         box-sizing: border-box;
@@ -184,6 +149,53 @@
         }
       }
     </style>
+    <script>
+      function logout() {
+        $.ajax({
+          url: "/logout",
+          method: "POST",
+          success: (res) => {
+            if (res.msg === "logout successful") {
+              window.location.reload();
+            }
+          },
+        });
+      }
+    </script>
+  </head>
+  <body>
+    <header>
+      <div class="banner">
+        <div class="goHomepage" onclick="location.href='/'">
+          <h1>Welcome to Campus Group Buying</h1>
+          <p>관심있는 상품을 등록하고 공동구매를 하는 공간입니다!</p>
+        </div>
+        <button
+          type="button"
+          class="btn btn-dark btn-lg"
+          id="register-button"
+          onClick="window.location.href='/register'"
+        >
+          상품 등록하러 가기
+        </button>
+      </div>
+
+      <div class="topnav">
+        <div class="login-container">
+          {% if session.username %}
+          <div class="d-flex align-items-center">
+            <span class="p-3">{{username}}</span>
+            <button onclick="logout()">로그아웃</button>
+          </div>
+          {% else %}
+          <button type="submit" onClick="location.href='signup'">
+            회원가입
+          </button>
+          <button type="submit" onClick="location.href='login'">로그인</button>
+          {% endif %}
+        </div>
+      </div>
+    </header>
 
     <div class="container-fluid w-50 mt-5">{% block body %} {% endblock %}</div>
   </body>

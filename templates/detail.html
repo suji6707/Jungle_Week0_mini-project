@@ -20,8 +20,8 @@
     <img src="{{product_info.imgUrl}}" class="img-fluid" />
   </div>
   <div class="col-md-6">
-    <h2>{{product_info.name}}</h2>
-    <p><strong>Price:</strong> {{product_info.price}}</p>
+    <h2 class="fs-4">{{product_info.name}}</h2>
+    <p class="my-2"><strong>가격:</strong> {{product_info.price}}원</p>
     <button
       onClick="addToBuyer('{{username|safe}}', '{{product_info.name}}')"
       class="btn btn-primary"
@@ -29,7 +29,7 @@
       참여하기
     </button>
   </div>
-  <h1>참여자 목록</h1>
+  <h1 class="fs-3 my-3">참여자 목록</h1>
 
   <ul class="list-group">
     {% for buyer in product_info.buyer %}

@@ -4,7 +4,7 @@ from flask import Flask, render_template, jsonify, request, session, redirect
 from flask_jwt_extended import create_access_token, create_refresh_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
-from flask_jwt_extended import get_jwt, set_access_cookies, set_refresh_cookies
+from flask_jwt_extended import unset_jwt_cookies, set_access_cookies, set_refresh_cookies
 from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 
@@ -44,8 +44,6 @@ def home():
 
 
 # 로그인
-
-
 @app.route('/login')
 def loginView():
     return render_template('login.html')
@@ -74,6 +72,16 @@ def login():
     set_access_cookies(resp, access_token)
     set_refresh_cookies(resp, refresh_token)
     return resp
+
+# 로그아웃
+
+
+@app.route("/logout", methods=["POST"])
+def logout():
+    session.pop('username', None)
+    response = jsonify({"msg": "logout successful"})
+    unset_jwt_cookies(response)
+    return response
 
 
 @app.route('/detail/<variable>', methods=['GET'])
@@ -121,7 +129,9 @@ def addToBuyer():
     participateUser = request.form['user_give']
     product_name = request.form['name_give']
     db.product.find_one_and_update(
-        {'name': product_name}, {'$push': {'buyer': participateUser}})
+        {'name': product_name},
+        {'$push': {'buyer': participateUser},
+         '$inc': {'buyerCount': 1}}, {'_id': 0})
     return jsonify({'msg': 'success'})
 
 
@@ -142,7 +152,7 @@ def show_products():
         '_id': False}).sort('likes', -1))
     print(lists)
 
-    return jsonify({'lists': lists})
+    return jsonify({'lists': lists}), 200
 
 
 # 입력받은 쿠팡 ulr로 데이터 DB에 넣기
@@ -152,7 +162,7 @@ def submit():
     category = request.form['category']
     count = request.form['count']
     getData(url, category, count)
-    return jsonify({'return':'success'})
+    return jsonify({'return': 'success'}), 200
 
 
 def getData(url, category, count):
@@ -161,7 +171,7 @@ def getData(url, category, count):
         'sec-ch-ua': '"Not_A Brand";v="99", "Google Chrome";v="109", "Chromium";v="109"',
         'sec-ch-ua-mobile': '?0',
         'sec-ch-ua-platform': '"Windows"',
-        'cookie': 'cookie: PCID=16505901704875933154078'
+        'cookie': 'PCID=16724534648113966367288'
     }
 
     data = requests.get(url, headers=headers, verify=False)
@@ -188,16 +198,24 @@ def getData(url, category, count):
 @ app.route('/like', methods=['POST'])
 def likeit():
     name = request.form['name']
-
     same_product = db.product.find_one({'name': name})
-
     target_likes = same_product['likes']
     new_likes = target_likes + 1
     db.product.update_one({'name': name}, {'$set': {'likes': new_likes}})
-
     return jsonify({'return': 'success'})
 
 # 상품등록
+
+# 전체 인기상품 TOP 10개
+
+
+@ app.route('/popular', methods=['GET'])
+def show_popular():
+    products = list(db.product.find({}, {'_id': False}).sort('likes', -1))
+    high_likes = []
+    for i in range(10):
+        high_likes.append(products[i])
+    return jsonify({'lists': high_likes})
 
 
 @ app.route('/register')

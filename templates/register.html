@@ -1,119 +1,113 @@
-{% extends "base.html" %} {% block title %}로그인{% endblock %} {% block head %}
-{{ super() }}
+{% extends "base.html" %} {% block title %}등록하기{% endblock %} {% block head
+%} {{ super() }}
 <script>
-
   function submitLink() {
     // url ajaxPOST 요청.
     let url = $("#url").val();
     let category = $("#category-id").val();
     let count = $("#count").val();
+    console.log(url, category, count);
     $.ajax({
       type: "POST",
       url: "/submit",
       data: {
-        url: url,
-        category: category,
-        count: count,
+        url,
+        category,
+        count,
       },
+
       success: function (response) {
-        if (response["return"] == "success") {
-          alert("저장 완료!");
-          window.location.reload();
+        if (response["return"] === "success") {
+          alert("저장완료");
+          window.location.href = "/";
         }
       },
     });
   }
-
 </script>
 
 <style>
-  @import url('https://fonts.googleapis.com/css?family=PT+Sans');
+  @import url("https://fonts.googleapis.com/css?family=PT+Sans");
 
-  body{
-    font-family: 'PT Sans', sans-serif;
+  body {
+    font-family: "PT Sans", sans-serif;
   }
 
-  h2{
+  h2 {
     padding-top: 1.5rem;
   }
 
-  .card{
-    border: 0.40rem solid #f8f9fa;
+  .card {
+    border: 0.4rem solid #f8f9fa;
     top: 10%;
   }
-  .form-control{
+  .form-control {
     background-color: #f8f9fa;
     padding: 20px;
     padding: 25px 15px;
     margin-bottom: 1.3rem;
   }
-  
+
   .form-control:focus {
-  
-      color: #000000;
-      background-color: #ffffff;
-      border: 2px solid #da5767;
-      outline: 0;
-      box-shadow: none;
-  
+    color: #000000;
+    background-color: #ffffff;
+    border: 2px solid blue;
+    outline: 0;
+    box-shadow: none;
   }
 
-  .btn{
+  .btn {
     padding: 0.6rem 1.2rem;
     font-size: 20px;
   }
-
 </style>
-
 
 {% endblock %} {% block body %}
 
-<div class = "container">
-  <div class = "row justify-content-center">
-    <div class="col-md-5">
-      <div class="card">
-        <h2 class ="card-title text-center">
-          관심 상품 등록하기
-        </h2>
-          <div class = "card-body py-md-4">
-            <form _lpchecked="1">
-              <div class="form-group">
-                <input 
-                type="text"
-                class="form-control"
-                id="url"
-                placeholder="상품 링크를 입력하세요"
-                />
-              </div>
-              <div class="form-group">
-                <label class="input-group-text" for="size">카테고리</label>
-                <select class="form-select" id="category-id">
-                  <option selected>-- 카테고리 --</option>
-                  <option value="fruit">과일/채소</option>
-                  <option value="bakery">간식/과자</option>
-                  <option value="drink">물/음료/커피</option>
-                  <option value="meal">간편식</option>
-                  <option value="necessity">생필품</option>
-                  <option value="clothes">섬유류</option>
-                  <option value="skincare">스킨케어</option>
-                  <option value="wash">비누/샴푸</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <input 
-                type="text"
-                class="form-control"
-                id="url"
-                placeholder="모집인원을 입력하세요"
-                />
-              </div>
-              <div class="d-flex flex-row align-items-center justify-content-between">
-                <button onclick="submitLink()" class="btn btn-primary btn-lg" href="#" role="button">링크 등록</a>
-              </div>
-            </form>
-          </div>
+<div class="card w-100">
+  <h2 class="card-title text-center fs-1">관심 상품 등록하기</h2>
+  <div class="card-body py-md-4">
+    <form _lpchecked="1">
+      <div class="form-group">
+        <input
+          type="text"
+          class="form-control"
+          id="url"
+          placeholder="상품 링크를 입력하세요"
+        />
       </div>
-    </div>
+      <div class="form-group mb-3">
+        <select class="form-select" id="category-id">
+          <option selected>-- 카테고리 --</option>
+          <option value="fruit">과일/채소</option>
+          <option value="bakery">간식/과자</option>
+          <option value="drink">물/음료/커피</option>
+          <option value="meal">간편식</option>
+          <option value="necessity">생필품</option>
+          <option value="clothes">섬유류</option>
+          <option value="skincare">스킨케어</option>
+          <option value="wash">비누/샴푸</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <input
+          id="count"
+          type="text"
+          class="form-control"
+          id="url"
+          placeholder="모집인원을 입력하세요"
+        />
+      </div>
+      <div class="d-flex flex-row align-items-center justify-content-center">
+        <a
+          onclick="submitLink()"
+          class="btn btn-primary btn-lg"
+          href="#"
+          role="button"
+          >링크 등록</a
+        >
+      </div>
+    </form>
   </div>
 </div>
 

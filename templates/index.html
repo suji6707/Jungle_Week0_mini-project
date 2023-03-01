@@ -3,7 +3,7 @@ head %} {{ super() }}
 <script>
   $(document).ready(function () {
     showGroup();
-    showCountDown();
+    showListMain();
     $(".carousel-item").first().addClass("active");
 
     // Add active class to clicked carousel item and remove from others
@@ -21,38 +21,51 @@ head %} {{ super() }}
   // 상품 카테고리 보여주기
   function showGroup() {
     let categoryDict = {
-      "fruit": ["과일/채소", "https://imgur.com/0Yn0Y2K.png"],
-      "bakery": ["간식/과자", "https://imgur.com/0TNaDbu.png"],
-      "drink": ["물/음료", "https://imgur.com/aRdzizE.png"],
-      "meal": ["간편식", "https://imgur.com/r8a400S.png"],
-      "necessity": ["생필품", "https://imgur.com/8uJ5dEL.png"],
-      "clothes": ["섬유류", "https://imgur.com/9AclHKx.png"],
-      "skincare": ["스킨케어", "https://imgur.com/c7e9Ic8.png"],
-      "wash": ["비누/샴푸", "https://imgur.com/nMW7tBt.png"]
+      fruit: ["과일/채소", "https://imgur.com/0Yn0Y2K.png"],
+      bakery: ["간식/과자", "https://imgur.com/0TNaDbu.png"],
+      drink: ["물/음료", "https://imgur.com/aRdzizE.png"],
+      meal: ["간편식", "https://imgur.com/r8a400S.png"],
+      necessity: ["생필품", "https://imgur.com/8uJ5dEL.png"],
+      clothes: ["섬유류", "https://imgur.com/9AclHKx.png"],
+      skincare: ["스킨케어", "https://imgur.com/c7e9Ic8.png"],
+      wash: ["비누/샴푸", "https://imgur.com/nMW7tBt.png"],
     };
 
     let all_group = Object.keys(categoryDict);
     let categoryBtns = Object.values(categoryDict);
 
-    console.log(all_group)
-
-    for (i=0; i<all_group.length; i++) {
-      console.log(all_group[i], categoryBtns[i])
-
-
+    for (i = 0; i < all_group.length; i++) {
       let temp_html = `
       <div class = "d-inline-flex flex-column">
         <img src="${categoryBtns[i][1]}" style= size:30px >
 
         <div type="button" onclick="showList('${all_group[i]}')" class="btn d-inline-flex">${categoryBtns[i][0]}</div>
-      </div>`  
-        $("#product-category").append(temp_html);
-      }
+      </div>`;
+      $("#product-category").append(temp_html);
     }
   }
 
-  function showCountDown() {}
-
+  function showListMain() {
+    $("#list-box").empty();
+    $.ajax({
+      type: "GET",
+      url: "/popular",
+      data: {},
+      success: function (response) {
+        let lists = response["lists"];
+        for (let i = 0; i < lists.length; i++) {
+          makeCard(
+            lists[i]["name"],
+            lists[i]["price"],
+            lists[i]["imgUrl"],
+            lists[i]["count"],
+            lists[i]["likes"],
+            lists[i]["buyerCount"]
+          );
+        }
+      },
+    });
+  }
   function showList(category) {
     $("#item-name").html(category);
     $("#list-box").empty();
@@ -63,31 +76,42 @@ head %} {{ super() }}
       data: {},
       success: function (response) {
         let lists = response["lists"];
-        for (let i = 0; i < lists.length; i++) {
-          makeCard(
-            lists[i]["name"],
-            lists[i]["price"],
-            lists[i]["imgUrl"],
-            lists[i]["count"],
-            lists[i]["likes"]
-          );
+        console.log(
+          "🚀 ~ file: index.html:79 ~ showList ~ lists:",
+          lists.length
+        );
+
+        if (lists.length === 0) {
+          let temp = "<h1 class='fs-3 p-3'>아직 등록된 상품이 없습니다.</h1>";
+          $("#list-box").append(temp);
+        } else {
+          for (let i = 0; i < lists.length; i++) {
+            makeCard(
+              lists[i]["name"],
+              lists[i]["price"],
+              lists[i]["imgUrl"],
+              lists[i]["count"],
+              lists[i]["likes"],
+              lists[i]["buyerCount"]
+            );
+          }
         }
       },
     });
   }
 
   // likes 부분 CSS 설정하기
-  function makeCard(name, price, imgUrl, count, likes) {
-    console.log(name, price, imgUrl, count, likes);
+  function makeCard(name, price, imgUrl, count, likes, buyerCount) {
     let temp = `
                       <li class="card-content list-group-item">
-                        <a href='/detail/${name}'>
+                        <a href='/detail/${name}' class="text-reset">
                           <div class="d-flex justify-content-between align-items-start">
                               <image class="product-image" src=${imgUrl}>
                               <div class="ms-2 me-auto">
                                   <div class="fw-bold">${name}</div>
                                       <p>가격: ${price}원</p>
-                                      <p>모집인원: ${count}</p>
+                                      <p>모집인원: ${count}명</p>
+                                      <p class='text-danger'>참여인원: ${buyerCount}명</p>
                               </div>
                               <span class="badge bg-primary rounded-pill">${likes}</span>
                           </div>
@@ -98,37 +122,10 @@ head %} {{ super() }}
                                       <i class="fa fa-thumbs-up fa-lg"></i>
                                   </span>
                               </a>
-                              <a class="card-footer-item has-text-danger" onclick="dislike('${name}')">
-                                  싫어요!
-                                  <span class="icon">
-                                      <i class="fa fa-thumbs-down fa-lg"></i>
-                                  </span>
-                              </a>
                           </footer>
                         </a>
                       </li>`;
     $("#list-box").append(temp);
-  }
-  function submitLink() {
-    // url ajaxPOST 요청.
-    let url = $("#url").val();
-    let category = $("#category-id").val();
-    let count = $("#count").val();
-    $.ajax({
-      type: "POST",
-      url: "/submit",
-      data: {
-        url: url,
-        category: category,
-        count: count,
-      },
-      success: function (response) {
-        if (response["return"] == "success") {
-          alert("저장 완료!");
-          window.location.reload();
-        }
-      },
-    });
   }
 
   function likeit(name) {
@@ -147,22 +144,21 @@ head %} {{ super() }}
   }
 </script>
 <style>
-#product-category {
-  display: flex, inline;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  width: 900px;
-  position: relative;
-  padding:1em;
-}
+  #product-category {
+    display: flex, inline;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 900px;
+    position: relative;
+    padding: 1em;
+  }
 
-#product-category > button {
-  margin: 50px;
-  padding:30px;
-  box-shadow: 0 0 0 1px black;
-  margin-bottom: 10px;
-}
-
+  #product-category > button {
+    margin: 50px;
+    padding: 30px;
+    box-shadow: 0 0 0 1px black;
+    margin-bottom: 10px;
+  }
 
   #product-category > button {
     margin: 10px;
@@ -170,26 +166,33 @@ head %} {{ super() }}
     box-shadow: 0 0 0 1px black;
     margin-bottom: 10px;
   }
+  .card-footer {
+    border-bottom: 1px solid #ededed;
+    border-top: none;
+  }
 </style>
 
 {% endblock %} {% block body %}
 
-
-
 <!-- 카테고리 그룹 -->
 <div class="flex-container wrap" id="product-category"></div>
-
-
-{% import 'slides.html' as slides %} {{slides.slides(recommend_product_info)}}
+<!-- 마감임박 리스트 -->
+<div class="countDown text-center">
+  <h2 class="card-title text-center fs-3 fw-bold">
+    놓치면 후회할 마감임박 상품 >
+  </h2>
+  {% import 'slides.html' as slides %} {{slides.slides(recommend_product_info)}}
+</div>
 
 <!-- 마감임박 리스트 -->
 
 <!-- 해당 카테고리 -->
-<div class="item-name" id="item-name"></div>
-
-
+<div class="item-name" id="item-name" style="color: white"></div>
+<h2 class="card-title fs-3 fw-bold my-4" style="margin-left: 70px">
+  인기템 TOP 10 >
+</h2>
 <!-- 상품리스트 -->
-<div class="list" id="list-box"></div>
+<div class="list" id="list-box" style="width: 600px; margin-left: 40px"></div>
 <ol class="list-group list-group-numbered">
   <!-- showCards -->
 </ol>
