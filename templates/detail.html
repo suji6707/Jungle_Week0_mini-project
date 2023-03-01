@@ -7,7 +7,9 @@
       method: "POST",
       data: { user_give: user, name_give: name },
       success: (res) => {
-        console.log(res);
+        if (res.msg === "success") {
+          window.location.reload();
+        }
       },
     });
   }
@@ -21,7 +23,7 @@
     <h2>{{product_info.name}}</h2>
     <p><strong>Price:</strong> {{product_info.price}}</p>
     <button
-      onClick="addToBuyer('{{current_user|safe}}', '{{product_info.name}}')"
+      onClick="addToBuyer('{{username|safe}}', '{{product_info.name}}')"
       class="btn btn-primary"
     >
       참여하기
