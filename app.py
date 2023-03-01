@@ -26,10 +26,12 @@ db = client.dbsparta
 # 메인페이지
 @app.route('/')
 def home():
-    test = db.product.find_one({'category': 'necessity'})
-    recommend_product_info = {'category': test['category'], 'name': test['name'], 'price': str(
-        test['price']), 'imgUrl': test['imgUrl'], 'count': test['count'], 'likes': str(test['likes']), 'buyer': test['buyer']}
-    return render_template('index.html')
+    query = {'$expr': {'$gt': ['$buyerCount', {'$subtract': ['$count', 3]}]}}
+    recommend_product_info = list(db.product.find(query, {'_id': 0}))
+    if recommend_product_info is None:
+        return render_template('index.html')
+    return render_template('index.html', recommend_product_info=recommend_product_info)
+
 
 # 로그인
 
@@ -102,7 +104,9 @@ def addToBuyer():
     participateUser = request.form['user_give']
     product_name = request.form['name_give']
     db.product.find_one_and_update(
-        {'name': product_name}, {'$push': {'buyer': participateUser}})
+        {'name': product_name},
+        {'$push': {'buyer': participateUser},
+         '$inc': {'buyerCount': 1}}, {'_id': 0})
     return jsonify({'msg': 'success'})
 
 
@@ -112,14 +116,17 @@ def show_group_category():
     print(all_group)
     return jsonify({'result': all_group})
 
+# 상품 리스트 가져오기
+
 
 @app.route('/list', methods=['GET'])
 def show_products():
     keyword = request.args.get('keyword')
-    products = list(db[keyword].find({}, {'_id': False}).sort('likes', -1))
-    print(products)
+    lists = list(db.product.find({'category': keyword}, {
+                 '_id': False}).sort('likes', -1))
+    print(lists)
 
-    return jsonify({'lists': products})
+    return jsonify({'lists': lists})
 
 
 # 입력받은 쿠팡 ulr로 데이터 DB에 넣기
@@ -138,9 +145,11 @@ def getData(url, category, count):
         'sec-ch-ua': '"Not_A Brand";v="99", "Google Chrome";v="109", "Chromium";v="109"',
         'sec-ch-ua-mobile': '?0',
         'sec-ch-ua-platform': '"Windows"',
-        'cookie': 'PCID=16724534648113966367288'
+        'cookie': 'cookie: PCID=16505901704875933154078'
     }
+
     data = requests.get(url, headers=headers, verify=False)
+
     soup = BeautifulSoup(data.text, 'html.parser')
     name = soup.select_one('.prod-buy-header__title').text
     price = soup.select_one(
@@ -151,13 +160,25 @@ def getData(url, category, count):
         'name': name,
         'price': int(price),
         'imgUrl': imgUrl,
-        'catetory': category,
-        'count': count,
+        'count': int(count),
         'likes': 0,
         'buyer': [],
+        'buyerCount': 0,
     }
     db.product.insert_one(doc)
-    print(name, price, imgUrl)
+
+
+@app.route('/like', methods=['POST'])
+def likeit():
+    name = request.form['name']
+
+    same_product = db.product.find_one({'name': name})
+
+    target_likes = same_product['likes']
+    new_likes = target_likes + 1
+    db.product.update_one({'name': name}, {'$set': {'likes': new_likes}})
+
+    return jsonify({'return': 'success'})
 
 
 if __name__ == '__main__':

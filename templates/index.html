@@ -3,28 +3,47 @@ head %} {{ super() }}
 <script>
   $(document).ready(function () {
     showGroup();
+    showCountDown();
+    $(".carousel-item").first().addClass("active");
+
+    // Add active class to clicked carousel item and remove from others
+    $("#carousel-control-prev").click(function () {
+      $(".active").prev().addClass("active");
+      $(".active").next().removeClass("active");
+    });
+
+    $("#carousel-control-next").click(function () {
+      $(".active").next().addClass("active");
+      $(".active").prev().removeClass("active");
+    });
   });
 
   // 상품 카테고리 보여주기
   function showGroup() {
-    $.ajax({
-      type: "GET",
-      url: "/group-list",
-      data: {},
-      success: function (response) {
-        all_group = response["result"];
-        for (let i = 0; i < all_group.length; i++) {
-          let temp_html = `
-                        <div type="button" onclick="showList('${all_group[i]}')" class="btn btn-primary d-inline-flex">${all_group[i]}
-                            <span class="close" onclick="deleteField(event)">
-                                <i class="gg-close-my"></i>
-                            </span>
-                        </div>`;
-          $("#product-category").append(temp_html);
-        }
-      },
-    });
+    let all_group = [
+      "fruit",
+      "bakery",
+      "drink",
+      "meal",
+      "necessity",
+      "clothes",
+      "skincare",
+      "wash",
+    ];
+
+    for (i = 0; i < all_group.length; i++) {
+      let temp_html = `
+            <div type="button" onclick="showList('${all_group[i]}')" class="btn btn-primary d-inline-flex">${all_group[i]}
+                <span class="close" onclick="deleteField(event)">
+                    <i class="gg-close-my"></i>
+                </span>
+            </div>`;
+
+      $("#product-category").append(temp_html);
+    }
   }
+
+  function showCountDown() {}
 
   function showList(category) {
     $("#item-name").html(category);
@@ -48,8 +67,10 @@ head %} {{ super() }}
       },
     });
   }
+
   // likes 부분 CSS 설정하기
   function makeCard(name, price, imgUrl, count, likes) {
+    console.log(name, price, imgUrl, count, likes);
     let temp = `
                       <li class="card-content list-group-item">
                         <a href='/detail/${name}'>
@@ -101,6 +122,21 @@ head %} {{ super() }}
       },
     });
   }
+
+  function likeit(name) {
+    let itemName = $("#item-name").text();
+
+    $.ajax({
+      type: "POST",
+      url: "/like",
+      data: { name: name },
+      success: function (response) {
+        if (response["return"] == "success") {
+          showList(itemName);
+        }
+      },
+    });
+  }
 </script>
 {% endblock %} {% block body %}
 
@@ -147,6 +183,13 @@ head %} {{ super() }}
 </div>
 
 <div class="list" id="product-category"></div>
+{% import 'slides.html' as slides %} {{slides.slides(recommend_product_info)}}
+
+<!-- 마감임박 리스트 -->
+
+<!-- 해당 카테고리 -->
+<div class="item-name" id="item-name"></div>
+<!-- 상품리스트 -->
 <div class="list" id="list-box"></div>
 <ol class="list-group list-group-numbered">
   <!-- showCards -->
