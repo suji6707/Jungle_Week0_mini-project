@@ -128,7 +128,10 @@ def show_products():
 @app.route('/submit', methods=['POST'])
 def submit():
     url = request.form['url']
-    getData(url)
+    category = request.form['category']
+    count = request.form['count']
+
+    getData(url, category, count)
     return jsonify({'return':'success'})
 
 
