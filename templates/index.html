@@ -1,55 +1,58 @@
-{% extends "base.html" %} {% block title %}메인페이지{% endblock %} {% block
-head %} {{ super() }}
+{% extends "base.html" %} {% block title %}메인페이지{% endblock %} 
+{% block head %} {{ super() }}
 <script>
-  $(document).ready(function () {
-    showGroup();
-  });
-  // 상품 카테고리 보여주기
-  function showGroup() {
-    // all db name을 가져와서, for문으로 id #product-category에 append.
-    $.ajax({
-      type: "GET",
-      url: "/group-list",
-      data: {},
-      success: function (response) {
-        all_group = response["result"];
-        for (let i = 0; i < all_group.length; i++) {
-          let temp_html = `
-                    <div type="button" onclick="showList('${all_group[i]}')" class="btn btn-primary d-inline-flex">${all_group[i]}
-                        <span class="close" onclick="deleteField(event)">
-                            <i class="gg-close-my"></i>
-                        </span>
-                    </div>`;
-          $("#product-category").append(temp_html);
+    $(document).ready(function () {
+        showGroup();
+        showCountDown();
+      });
+      
+      // 상품 카테고리 보여주기
+    function showGroup() {
+        let all_group = ["fruit", "bakery", "drink", "meal", "necessity", "clothes", "skincare", "wash"];
+        
+        for (i=0; i<all_group.length; i++) {
+            let temp_html = `
+            <div type="button" onclick="showList('${all_group[i]}')" class="btn btn-primary d-inline-flex">${all_group[i]}
+                <span class="close" onclick="deleteField(event)">
+                    <i class="gg-close-my"></i>
+                </span>
+            </div>`;
+
+        $("#product-category").append(temp_html);
         }
-    })
-}
+    }
 
+    function showCountDown() {
 
-function showList(category) {
-    $('#item-name').html(category)
-    $('#list-box').empty()
+    }
 
-    $.ajax({
-      type: "GET",
-      url: `/list?keyword=${category}`,
-      data: {},
-      success: function (response) {
-        let lists = response["lists"];
-        for (let i = 0; i < lists.length; i++) {
-          makeCard(
-            lists[i]["name"],
-            lists[i]["price"],
-            lists[i]["imgUrl"],
-            lists[i]["count"],
-            lists[i]["likes"]
-          );
-        }
-      },
-    });
-  }
+    
+    function showList(category) {
+        $('#item-name').html(category)
+        $('#list-box').empty()
+        
+        $.ajax({
+            type: "GET",
+            url: `/list?keyword=${category}`,
+            data: {},
+            success: function (response) {
+            let lists = response["lists"];
+            for (let i = 0; i < lists.length; i++) {
+                makeCard(
+                lists[i]["name"],
+                lists[i]["price"],
+                lists[i]["imgUrl"],
+                lists[i]["count"],
+                lists[i]["likes"]
+                );
+            }
+            },
+        });
+    }
+  
   // likes 부분 CSS 설정하기
   function makeCard(name, price, imgUrl, count, likes) {
+    console.log(name, price, imgUrl, count, likes)
     let temp = `
                     <li class="card-content list-group-item">
                         <div class="d-flex justify-content-between align-items-start">
@@ -78,6 +81,8 @@ function showList(category) {
                     </li>`;
     $("#list-box").append(temp);
   }
+
+
   function submitLink() {
     // url ajaxPOST 요청.
     let url = $("#url").val();
@@ -99,6 +104,24 @@ function showList(category) {
       },
     });
   }
+
+  function likeit(name) {
+    let itemName = $('#item-name').text()
+
+    $.ajax({
+        type: "POST",
+        url: "/like",
+        data: {'name': name},
+        success: function(response) {
+            if (response['return'] == 'success') {
+                showList(itemName);
+            }
+        }
+    }) 
+  }
+
+
+
 </script>
 {% endblock %} {% block body %}
 
@@ -125,7 +148,7 @@ function showList(category) {
         <option value="skincare">스킨케어</option>
         <option value="wash">비누/샴푸</option>
       </select>
-    </div>
+    </div> 
     <input
       type="text"
       class="form-control"
@@ -134,19 +157,27 @@ function showList(category) {
     />
   </div>
   <p class="lead">
-    <a
-      onclick="submitLink()"
-      class="btn btn-primary btn-lg"
-      href="#"
-      role="button"
-      >링크 등록</a
-    >
+    <a onclick="submitLink()" class="btn btn-primary btn-lg" href="#" role="button">링크 등록</a>
   </p>
 </div>
+
+<!-- 카테고리 그룹 -->
 <div class="list" id="product-category"></div>
+
+<!-- 마감임박 리스트 -->
+<div class="list" id="countDown-list">
+
+
+
+
+</div>
+
+<!-- 해당 카테고리 -->
+<div class="item-name" id="item-name"></div>
+<!-- 상품리스트 -->
 <div class="list" id="list-box"></div>
 <ol class="list-group list-group-numbered">
   <!-- showCards -->
+</ol>
 
   {% endblock %}
-</ol>

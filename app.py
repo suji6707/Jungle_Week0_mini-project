@@ -87,39 +87,42 @@ def signup():
 
     if email == checkExistEmail:
         return '존재하는 이메일입니다.', 400
-    
+
+# DB 카테고리 user 제외하고 가져오기    
 @app.route('/group-list', methods=['GET'])
 def show_group_category():
     all_group = db.list_collection_names()
-    print(all_group)
+    print(all_group.remove('user'))
     return jsonify({'result': all_group})
 
-
+# 상품 리스트 가져오기
 @app.route('/list', methods=['GET'])
 def show_products():
     keyword = request.args.get('keyword')
-    products = list(db[keyword].find({}, {'_id':False}).sort('likes', -1))
-    print(products)
+    lists = list(db.product.find({'category': keyword}, {'_id':False}).sort('likes', -1))
+    print(lists)
 
-    return jsonify({'lists': products})
+    return jsonify({'lists': lists})
 
-
-
-# 입력받은 쿠팡 ulr로 데이터 DB에 넣기
+# 쿠팡 상품링크 넣기
 @app.route('/submit', methods=['POST'])
 def submit():
     url = request.form['url']
-    getData(url)
+    category = request.form['category']
+    count = request.form['count']
+
+    getData(url, category, count)
+
     return jsonify({'return':'success'})
 
-def getData(url):
+def getData(url, category, count):
 
     headers = {
         'user-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
         'sec-ch-ua' : '"Not_A Brand";v="99", "Google Chrome";v="109", "Chromium";v="109"',
         'sec-ch-ua-mobile': '?0',
         'sec-ch-ua-platform': '"Windows"',
-        'cookie': 'cookie: PCID=16505901704875933154078'
+        'cookie': 'PCID=16724534648113966367288'
         }
 
     data = requests.get(url, headers = headers, verify=False)
@@ -131,13 +134,35 @@ def getData(url):
     imgUrl = "https:" + soup.select_one('.prod-image__detail')['src']
 
     doc = {
+        'category': category,
         'name': name, 
         'price' : int(price),
-        'imgUrl' : imgUrl
+        'imgUrl' : imgUrl,
+        'catetory' : category,
+        'count' : count,
+        'likes' : 0,
+        'buyer' : []
     }
 
     db.product.insert_one(doc)
-    print(name, price, imgUrl)
+
+#상세 페이지
+@app.route('/detail')
+def detailView():
+    return render_template('detail.html')
+
+@app.route('/like', methods=['POST'])
+def likeit():
+    name = request.form['name']
+
+    same_product = db.product.find_one({'name': name})
+
+    target_likes = same_product['likes']
+    new_likes = target_likes + 1
+    db.product.update_one({'name':name},{'$set':{'likes':new_likes}})
+
+    return jsonify({'return': 'success'})
+
 
 if __name__ == '__main__':
    app.run('0.0.0.0',port=5000,debug=True)
