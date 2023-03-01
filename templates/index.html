@@ -1,58 +1,76 @@
 {% extends "base.html" %} {% block title %}메인페이지{% endblock %} 
 {% block head %} {{ super() }}
 <script>
-    $(document).ready(function () {
-        showGroup();
-        showCountDown();
-      });
-      
-      // 상품 카테고리 보여주기
-    function showGroup() {
-        let all_group = ["fruit", "bakery", "drink", "meal", "necessity", "clothes", "skincare", "wash"];
-        
-        for (i=0; i<all_group.length; i++) {
-            let temp_html = `
+  $(document).ready(function () {
+    showGroup();
+    showCountDown();
+    $(".carousel-item").first().addClass("active");
+
+    // Add active class to clicked carousel item and remove from others
+    $("#carousel-control-prev").click(function () {
+      $(".active").prev().addClass("active");
+      $(".active").next().removeClass("active");
+    });
+
+    $("#carousel-control-next").click(function () {
+      $(".active").next().addClass("active");
+      $(".active").prev().removeClass("active");
+    });
+  });
+
+  // 상품 카테고리 보여주기
+  function showGroup() {
+    let all_group = [
+      "fruit",
+      "bakery",
+      "drink",
+      "meal",
+      "necessity",
+      "clothes",
+      "skincare",
+      "wash",
+    ];
+
+    for (i = 0; i < all_group.length; i++) {
+      let temp_html = `
             <div type="button" onclick="showList('${all_group[i]}')" class="btn btn-primary d-inline-flex">${all_group[i]}
                 <span class="close" onclick="deleteField(event)">
                     <i class="gg-close-my"></i>
                 </span>
             </div>`;
 
-        $("#product-category").append(temp_html);
+      $("#product-category").append(temp_html);
+    }
+  }
+
+  function showCountDown() {}
+
+  function showList(category) {
+    $("#item-name").html(category);
+    $("#list-box").empty();
+
+    $.ajax({
+      type: "GET",
+      url: `/list?keyword=${category}`,
+      data: {},
+      success: function (response) {
+        let lists = response["lists"];
+        for (let i = 0; i < lists.length; i++) {
+          makeCard(
+            lists[i]["name"],
+            lists[i]["price"],
+            lists[i]["imgUrl"],
+            lists[i]["count"],
+            lists[i]["likes"]
+          );
         }
-    }
+      },
+    });
+  }
 
-    function showCountDown() {
-
-    }
-
-    
-    function showList(category) {
-        $('#item-name').html(category)
-        $('#list-box').empty()
-        
-        $.ajax({
-            type: "GET",
-            url: `/list?keyword=${category}`,
-            data: {},
-            success: function (response) {
-            let lists = response["lists"];
-            for (let i = 0; i < lists.length; i++) {
-                makeCard(
-                lists[i]["name"],
-                lists[i]["price"],
-                lists[i]["imgUrl"],
-                lists[i]["count"],
-                lists[i]["likes"]
-                );
-            }
-            },
-        });
-    }
-  
   // likes 부분 CSS 설정하기
   function makeCard(name, price, imgUrl, count, likes) {
-    console.log(name, price, imgUrl, count, likes)
+    console.log(name, price, imgUrl, count, likes);
     let temp = `
                       <li class="card-content list-group-item">
                         <a href='/detail/${name}'>
@@ -162,14 +180,9 @@
 
 <!-- 카테고리 그룹 -->
 <div class="list" id="product-category"></div>
+{% import 'slides.html' as slides %} {{slides.slides(recommend_product_info)}}
 
 <!-- 마감임박 리스트 -->
-<div class="list" id="countDown-list">
-
-
-
-
-</div>
 
 <!-- 해당 카테고리 -->
 <div class="item-name" id="item-name"></div>

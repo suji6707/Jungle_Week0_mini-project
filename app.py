@@ -26,10 +26,12 @@ db = client.dbsparta
 # 메인페이지
 @app.route('/')
 def home():
-    test = db.product.find_one({'category': 'necessity'})
-    recommend_product_info = {'category': test['category'], 'name': test['name'], 'price': str(
-        test['price']), 'imgUrl': test['imgUrl'], 'count': test['count'], 'likes': str(test['likes']), 'buyer': test['buyer']}
-    return render_template('index.html')
+    query = {'$expr': {'$gt': ['$buyerCount', {'$subtract': ['$count', 3]}]}}
+    recommend_product_info = list(db.product.find(query, {'_id': 0}))
+    if recommend_product_info is None:
+        return render_template('index.html')
+    return render_template('index.html', recommend_product_info=recommend_product_info)
+
 
 # 로그인
 
@@ -102,7 +104,9 @@ def addToBuyer():
     participateUser = request.form['user_give']
     product_name = request.form['name_give']
     db.product.find_one_and_update(
-        {'name': product_name}, {'$push': {'buyer': participateUser}})
+        {'name': product_name},
+        {'$push': {'buyer': participateUser},
+         '$inc': {'buyerCount': 1}}, {'_id': 0})
     return jsonify({'msg': 'success'})
 
 
@@ -148,9 +152,14 @@ def getData(url, category, count):
         '.total-price').text.replace('원', '').replace(',', '')
     imgUrl = "https:" + soup.select_one('.prod-image__detail')['src']
     doc = {
-        'name': name, 
-        'price' : int(price),
-        'imgUrl' : imgUrl
+        'category': category,
+        'name': name,
+        'price': int(price),
+        'imgUrl': imgUrl,
+        'count': int(count),
+        'likes': 0,
+        'buyer': [],
+        'buyerCount': 0,
     }
     db.product.insert_one(doc)
 
