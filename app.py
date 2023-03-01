@@ -113,30 +113,26 @@ def addToBuyer():
 @app.route('/group-list', methods=['GET'])
 def show_group_category():
     all_group = db.list_collection_names()
-    print(all_group)
+    print(all_group.remove('user'))
     return jsonify({'result': all_group})
 
 # 상품 리스트 가져오기
-
-
 @app.route('/list', methods=['GET'])
 def show_products():
     keyword = request.args.get('keyword')
-    lists = list(db.product.find({'category': keyword}, {
-                 '_id': False}).sort('likes', -1))
+    lists = list(db.product.find({'category': keyword}, {'_id':False}).sort('likes', -1))
     print(lists)
 
     return jsonify({'lists': lists})
+
 
 
 # 입력받은 쿠팡 ulr로 데이터 DB에 넣기
 @app.route('/submit', methods=['POST'])
 def submit():
     url = request.form['url']
-    category = request.form['category']
-    count = request.form['count']
-    getData(url, category, count)
-    return jsonify({'return': 'success'})
+    getData(url)
+    return jsonify({'return':'success'})
 
 
 def getData(url, category, count):
@@ -146,9 +142,9 @@ def getData(url, category, count):
         'sec-ch-ua-mobile': '?0',
         'sec-ch-ua-platform': '"Windows"',
         'cookie': 'cookie: PCID=16505901704875933154078'
-    }
+        }
 
-    data = requests.get(url, headers=headers, verify=False)
+    data = requests.get(url, headers = headers, verify=False)
 
     soup = BeautifulSoup(data.text, 'html.parser')
     name = soup.select_one('.prod-buy-header__title').text
@@ -168,6 +164,7 @@ def getData(url, category, count):
     db.product.insert_one(doc)
 
 
+
 @app.route('/like', methods=['POST'])
 def likeit():
     name = request.form['name']
@@ -176,9 +173,10 @@ def likeit():
 
     target_likes = same_product['likes']
     new_likes = target_likes + 1
-    db.product.update_one({'name': name}, {'$set': {'likes': new_likes}})
+    db.product.update_one({'name':name},{'$set':{'likes':new_likes}})
 
     return jsonify({'return': 'success'})
+
 
 
 if __name__ == '__main__':

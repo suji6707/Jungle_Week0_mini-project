@@ -1,5 +1,5 @@
-{% extends "base.html" %} {% block title %}메인페이지{% endblock %} {% block
-head %} {{ super() }}
+{% extends "base.html" %} {% block title %}메인페이지{% endblock %} 
+{% block head %} {{ super() }}
 <script>
   $(document).ready(function () {
     showGroup();
@@ -100,7 +100,6 @@ head %} {{ super() }}
                       </li>`;
     $("#list-box").append(temp);
   }
-
   function submitLink() {
     // url ajaxPOST 요청.
     let url = $("#url").val();
@@ -124,19 +123,22 @@ head %} {{ super() }}
   }
 
   function likeit(name) {
-    let itemName = $("#item-name").text();
+    let itemName = $('#item-name').text()
 
     $.ajax({
-      type: "POST",
-      url: "/like",
-      data: { name: name },
-      success: function (response) {
-        if (response["return"] == "success") {
-          showList(itemName);
+        type: "POST",
+        url: "/like",
+        data: {'name': name},
+        success: function(response) {
+            if (response['return'] == 'success') {
+                showList(itemName);
+            }
         }
-      },
-    });
+    }) 
   }
+
+
+
 </script>
 {% endblock %} {% block body %}
 
@@ -163,7 +165,7 @@ head %} {{ super() }}
         <option value="skincare">스킨케어</option>
         <option value="wash">비누/샴푸</option>
       </select>
-    </div>
+    </div> 
     <input
       type="text"
       class="form-control"
@@ -172,16 +174,11 @@ head %} {{ super() }}
     />
   </div>
   <p class="lead">
-    <a
-      onclick="submitLink()"
-      class="btn btn-primary btn-lg"
-      href="#"
-      role="button"
-      >링크 등록</a
-    >
+    <a onclick="submitLink()" class="btn btn-primary btn-lg" href="#" role="button">링크 등록</a>
   </p>
 </div>
 
+<!-- 카테고리 그룹 -->
 <div class="list" id="product-category"></div>
 {% import 'slides.html' as slides %} {{slides.slides(recommend_product_info)}}
 
