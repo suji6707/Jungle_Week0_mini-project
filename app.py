@@ -8,9 +8,13 @@ from flask_jwt_extended import unset_jwt_cookies, set_access_cookies, set_refres
 from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
 from pymongo import MongoClient
 import requests
 from bs4 import BeautifulSoup
+
 
 app = Flask(__name__)
 app.secret_key = 'a77i%rqxfl#1sfta6#g+$li$%!%+0!+%om4je-(!h+rapwnwky'
@@ -61,7 +65,6 @@ def login():
 
     # 비밀번호 체크
     checkPassword = checkExist['password']
-    print(bcrypt.check_password_hash(checkPassword, password))
     if bcrypt.check_password_hash(checkPassword, password) is False:
         return '비밀번호가 다릅니다. 비밀번호를 확인하세요.', 400
     username = checkExist['username']
@@ -150,7 +153,6 @@ def show_products():
     keyword = request.args.get('keyword')
     lists = list(db.product.find({'category': keyword}, {
         '_id': False}).sort('likes', -1))
-    print(lists)
 
     return jsonify({'lists': lists}), 200
 
@@ -166,21 +168,19 @@ def submit():
 
 
 def getData(url, category, count):
-    headers = {
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
-        'sec-ch-ua': '"Not_A Brand";v="99", "Google Chrome";v="109", "Chromium";v="109"',
-        'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"Windows"',
-        'cookie': 'PCID=16724534648113966367288'
-    }
+    chrome_options = Options()
+    chrome_options.add_experimental_option("detach", True)
+    chrome_options.add_argument('headless')
+    chrome_options.add_argument('window-size=1920x1080')
+    chrome_options.add_argument("disable-gpu")
+    browser = webdriver.Chrome(chrome_options=chrome_options)
+    browser.get(url)
+    name = browser.find_element(By.CLASS_NAME, 'prod-buy-header__title').text
+    price = browser.find_element(
+        By.CLASS_NAME, 'total-price').text.replace(',', '').replace('원', '')
+    imgUrl = browser.find_element(
+        By.CLASS_NAME, 'prod-image__detail').get_attribute("src")
 
-    data = requests.get(url, headers=headers, verify=False)
-
-    soup = BeautifulSoup(data.text, 'html.parser')
-    name = soup.select_one('.prod-buy-header__title').text
-    price = soup.select_one(
-        '.total-price').text.replace('원', '').replace(',', '')
-    imgUrl = "https:" + soup.select_one('.prod-image__detail')['src']
     doc = {
         'category': category,
         'name': name,
@@ -193,8 +193,9 @@ def getData(url, category, count):
     }
     db.product.insert_one(doc)
 
-
 # 좋아요 count
+
+
 @ app.route('/like', methods=['POST'])
 def likeit():
     name = request.form['name']
@@ -219,8 +220,10 @@ def show_popular():
 
 
 @ app.route('/register')
+@jwt_required()
 def register():
-    return render_template('register.html')
+    username = get_jwt_identity()
+    return render_template('register.html', username=username)
 
 
 if __name__ == '__main__':
