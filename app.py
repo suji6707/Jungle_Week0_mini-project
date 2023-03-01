@@ -1,4 +1,6 @@
-from flask import Flask, render_template, jsonify, request, make_response
+from datetime import timedelta
+
+from flask import Flask, render_template, jsonify, request, session, redirect
 from flask_jwt_extended import create_access_token, create_refresh_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
@@ -11,8 +13,11 @@ import requests
 from bs4 import BeautifulSoup
 
 app = Flask(__name__)
+app.secret_key = 'a77i%rqxfl#1sfta6#g+$li$%!%+0!+%om4je-(!h+rapwnwky'
 app.config["JWT_SECRET_KEY"] = "secret"
 app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=1)
+app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=30)
 app.config['JWT_ACCESS_COOKIE_PATH'] = '/'
 app.config['JWT_REFRESH_COOKIE_PATH'] = '/'
 
@@ -26,11 +31,16 @@ db = client.dbsparta
 # 메인페이지
 @app.route('/')
 def home():
+    username = None
     query = {'$expr': {'$gt': ['$buyerCount', {'$subtract': ['$count', 3]}]}}
     recommend_product_info = list(db.product.find(query, {'_id': 0}))
+    try:
+        username = session['username']
+    except KeyError:
+        return render_template('index.html', recommend_product_info=recommend_product_info)
     if recommend_product_info is None:
         return render_template('index.html')
-    return render_template('index.html', recommend_product_info=recommend_product_info)
+    return render_template('index.html', recommend_product_info=recommend_product_info, username=username)
 
 
 # 로그인
@@ -57,6 +67,7 @@ def login():
     if bcrypt.check_password_hash(checkPassword, password) is False:
         return '비밀번호가 다릅니다. 비밀번호를 확인하세요.', 400
     username = checkExist['username']
+    session['username'] = username
     access_token = create_access_token(identity=username)
     refresh_token = create_refresh_token(identity=username)
     resp = jsonify({'login': True})
@@ -65,15 +76,21 @@ def login():
     return resp
 
 
-
 @app.route('/detail/<variable>', methods=['GET'])
 @jwt_required()
 def detailPage(variable):
-    current_user = get_jwt_identity()
+    username = get_jwt_identity()
     product_info = db.product.find_one({'name': variable}, {'_id': 0})
-    return render_template('detail.html', current_user=current_user, product_info=product_info), 200
+    return render_template('detail.html', username=username, product_info=product_info), 200
+
+
+@jwt.unauthorized_loader
+def unauthorized_callback(error):
+    return redirect('/login')
 
 # 회원가입
+
+
 @app.route('/signup', methods=['GET'])
 def signupView():
     return render_template('signUp.html')
@@ -97,6 +114,8 @@ def signup():
         return '존재하는 이메일입니다.', 400
 
 # 참여하기 추가
+
+
 @app.route('/add-to-buyer', methods=['POST'])
 def addToBuyer():
     participateUser = request.form['user_give']
@@ -106,31 +125,32 @@ def addToBuyer():
     return jsonify({'msg': 'success'})
 
 
-# DB 카테고리 user 제외하고 가져오기    
-@app.route('/group-list', methods=['GET'])
+# DB 카테고리 user 제외하고 가져오기
+@ app.route('/group-list', methods=['GET'])
 def show_group_category():
     all_group = db.list_collection_names()
     print(all_group.remove('user'))
     return jsonify({'result': all_group})
 
 # 상품 리스트 가져오기
-@app.route('/list', methods=['GET'])
+
+
+@ app.route('/list', methods=['GET'])
 def show_products():
     keyword = request.args.get('keyword')
-    lists = list(db.product.find({'category': keyword}, {'_id':False}).sort('likes', -1))
+    lists = list(db.product.find({'category': keyword}, {
+        '_id': False}).sort('likes', -1))
     print(lists)
 
     return jsonify({'lists': lists})
 
 
-
 # 입력받은 쿠팡 ulr로 데이터 DB에 넣기
-@app.route('/submit', methods=['POST'])
+@ app.route('/submit', methods=['POST'])
 def submit():
     url = request.form['url']
     category = request.form['category']
     count = request.form['count']
-
     getData(url, category, count)
     return jsonify({'return':'success'})
 
@@ -142,9 +162,9 @@ def getData(url, category, count):
         'sec-ch-ua-mobile': '?0',
         'sec-ch-ua-platform': '"Windows"',
         'cookie': 'cookie: PCID=16505901704875933154078'
-        }
+    }
 
-    data = requests.get(url, headers = headers, verify=False)
+    data = requests.get(url, headers=headers, verify=False)
 
     soup = BeautifulSoup(data.text, 'html.parser')
     name = soup.select_one('.prod-buy-header__title').text
@@ -165,7 +185,7 @@ def getData(url, category, count):
 
 
 # 좋아요 count
-@app.route('/like', methods=['POST'])
+@ app.route('/like', methods=['POST'])
 def likeit():
     name = request.form['name']
 
@@ -173,12 +193,14 @@ def likeit():
 
     target_likes = same_product['likes']
     new_likes = target_likes + 1
-    db.product.update_one({'name':name},{'$set':{'likes':new_likes}})
+    db.product.update_one({'name': name}, {'$set': {'likes': new_likes}})
 
     return jsonify({'return': 'success'})
 
 # 상품등록
-@app.route('/register')
+
+
+@ app.route('/register')
 def register():
     return render_template('register.html')
 
