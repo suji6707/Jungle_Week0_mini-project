@@ -8,9 +8,6 @@ from flask_jwt_extended import unset_jwt_cookies, set_access_cookies, set_refres
 from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
 from pymongo import MongoClient
 import requests
 from bs4 import BeautifulSoup
@@ -168,18 +165,29 @@ def submit():
 
 
 def getData(url, category, count):
-    chrome_options = Options()
-    chrome_options.add_experimental_option("detach", True)
-    chrome_options.add_argument('headless')
-    chrome_options.add_argument('window-size=1920x1080')
-    chrome_options.add_argument("disable-gpu")
-    browser = webdriver.Chrome(chrome_options=chrome_options)
-    browser.get(url)
-    name = browser.find_element(By.CLASS_NAME, 'prod-buy-header__title').text
-    price = browser.find_element(
-        By.CLASS_NAME, 'total-price').text.replace(',', '').replace('원', '')
-    imgUrl = browser.find_element(
-        By.CLASS_NAME, 'prod-image__detail').get_attribute("src")
+    headers = {
+        'authority': 'www.coupang.com',
+        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+        'accept-language': 'ko,en-US;q=0.9,en;q=0.8',
+        'cache-control': 'no-cache',
+        'dnt': '1',
+        'pragma': 'no-cache',
+        'referer': 'https://www.coupang.com/np',
+        'sec-ch-ua': '"Not A(Brand";v="24", "Chromium";v="110"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"macOS"',
+        'sec-fetch-dest': 'document',
+        'sec-fetch-user': '?1',
+        'upgrade-insecure-requests': '1',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36'
+    }
+
+    data = requests.get(url, headers=headers)
+    soup = BeautifulSoup(data.text, 'html.parser')
+    name = soup.select_one('.prod-buy-header__title').text
+    price = soup.select_one(
+        '.total-price').text.replace('원', '').replace(',', '')
+    imgUrl = "https:" + soup.select_one('.prod-image__detail')['src']
 
     doc = {
         'category': category,
@@ -191,7 +199,9 @@ def getData(url, category, count):
         'buyer': [],
         'buyerCount': 0,
     }
-    db.product.insert_one(doc)
+
+
+db.product.insert_one(doc)
 
 # 좋아요 count
 
