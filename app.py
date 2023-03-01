@@ -109,27 +109,26 @@ def addToBuyer():
 @app.route('/group-list', methods=['GET'])
 def show_group_category():
     all_group = db.list_collection_names()
-    print(all_group)
+    print(all_group.remove('user'))
     return jsonify({'result': all_group})
 
-
+# 상품 리스트 가져오기
 @app.route('/list', methods=['GET'])
 def show_products():
     keyword = request.args.get('keyword')
-    products = list(db[keyword].find({}, {'_id': False}).sort('likes', -1))
-    print(products)
+    lists = list(db.product.find({'category': keyword}, {'_id':False}).sort('likes', -1))
+    print(lists)
 
-    return jsonify({'lists': products})
+    return jsonify({'lists': lists})
+
 
 
 # 입력받은 쿠팡 ulr로 데이터 DB에 넣기
 @app.route('/submit', methods=['POST'])
 def submit():
     url = request.form['url']
-    category = request.form['category']
-    count = request.form['count']
-    getData(url, category, count)
-    return jsonify({'return': 'success'})
+    getData(url)
+    return jsonify({'return':'success'})
 
 
 def getData(url, category, count):
@@ -138,26 +137,37 @@ def getData(url, category, count):
         'sec-ch-ua': '"Not_A Brand";v="99", "Google Chrome";v="109", "Chromium";v="109"',
         'sec-ch-ua-mobile': '?0',
         'sec-ch-ua-platform': '"Windows"',
-        'cookie': 'PCID=16724534648113966367288'
-    }
-    data = requests.get(url, headers=headers, verify=False)
+        'cookie': 'cookie: PCID=16505901704875933154078'
+        }
+
+    data = requests.get(url, headers = headers, verify=False)
+
     soup = BeautifulSoup(data.text, 'html.parser')
     name = soup.select_one('.prod-buy-header__title').text
     price = soup.select_one(
         '.total-price').text.replace('원', '').replace(',', '')
     imgUrl = "https:" + soup.select_one('.prod-image__detail')['src']
     doc = {
-        'category': category,
-        'name': name,
-        'price': int(price),
-        'imgUrl': imgUrl,
-        'catetory': category,
-        'count': count,
-        'likes': 0,
-        'buyer': [],
+        'name': name, 
+        'price' : int(price),
+        'imgUrl' : imgUrl
     }
     db.product.insert_one(doc)
-    print(name, price, imgUrl)
+
+
+
+@app.route('/like', methods=['POST'])
+def likeit():
+    name = request.form['name']
+
+    same_product = db.product.find_one({'name': name})
+
+    target_likes = same_product['likes']
+    new_likes = target_likes + 1
+    db.product.update_one({'name':name},{'$set':{'likes':new_likes}})
+
+    return jsonify({'return': 'success'})
+
 
 
 if __name__ == '__main__':
