@@ -152,7 +152,7 @@ def submit():
     category = request.form['category']
     count = request.form['count']
     getData(url, category, count)
-    return jsonify({'return': 'success'})
+    return jsonify({'return':'success'})
 
 
 def getData(url, category, count):
