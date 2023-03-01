@@ -1,5 +1,5 @@
-{% extends "base.html" %} {% block title %}메인페이지{% endblock %} 
-{% block head %} {{ super() }}
+{% extends "base.html" %} {% block title %}메인페이지{% endblock %} {% block
+head %} {{ super() }}
 <script>
   $(document).ready(function () {
     showGroup();
@@ -39,9 +39,9 @@
                 </span>
             </div>`;
 
-        $("#product-category").append(temp_html);
-      }
+      $("#product-category").append(temp_html);
     }
+  }
 
   function showCountDown() {}
 
@@ -124,46 +124,39 @@
   }
 
   function likeit(name) {
-    let itemName = $('#item-name').text()
+    let itemName = $("#item-name").text();
 
     $.ajax({
-        type: "POST",
-        url: "/like",
-        data: {'name': name},
-        success: function(response) {
-            if (response['return'] == 'success') {
-                showList(itemName);
-            }
+      type: "POST",
+      url: "/like",
+      data: { name: name },
+      success: function (response) {
+        if (response["return"] == "success") {
+          showList(itemName);
         }
-    }) 
+      },
+    });
   }
-
-
-
 </script>
 <style>
-#product-category {
-  display: flex, inline;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  width: 100%;
-  position: relative;
-  padding:1em;
-}
+  #product-category {
+    display: flex, inline;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 100%;
+    position: relative;
+    padding: 1em;
+  }
 
-#product-category > button {
-  margin: 10px;
-  flex: 50%;
-  box-shadow: 0 0 0 1px black;
-  margin-bottom: 10px;
-}
-
-
+  #product-category > button {
+    margin: 10px;
+    flex: 50%;
+    box-shadow: 0 0 0 1px black;
+    margin-bottom: 10px;
+  }
 </style>
 
 {% endblock %} {% block body %}
-
-
 
 <!-- 카테고리 그룹 2 row로 분리 -->
 <div class="flex-container wrap" id="product-category"></div>
