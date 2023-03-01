@@ -1,0 +1,44 @@
+{% extends "base.html" %} {% block title %}로그인{% endblock %} {% block head %}
+{{ super() }}
+<script>
+
+</script>
+{% endblock %} {% block body %}
+
+<div class="jumbotron">
+    <h1 class="display-4">관심상품 등록하기</h1>
+    <p class="lead">관심있는 상품을 등록하고 공동구매를 하는 공간입니다!</p>
+    <div class="form-group">
+      <input
+        type="text"
+        class="form-control"
+        id="url"
+        placeholder="상품 링크를 입력하세요"
+      />
+      <div class="input-group mb-3">
+        <label class="input-group-text" for="size">카테고리</label>
+        <select class="form-select" id="category-id">
+          <option selected>-- 카테고리 --</option>
+          <option value="fruit">과일/채소</option>
+          <option value="bakery">간식/과자</option>
+          <option value="drink">물/음료/커피</option>
+          <option value="meal">간편식</option>
+          <option value="necessity">생필품</option>
+          <option value="clothes">섬유류</option>
+          <option value="skincare">스킨케어</option>
+          <option value="wash">비누/샴푸</option>
+        </select>
+      </div> 
+      <input
+        type="text"
+        class="form-control"
+        id="count"
+        placeholder="모집인원을 입력하세요"
+      />
+    </div>
+    <p class="lead">
+      <a onclick="submitLink()" class="btn btn-primary btn-lg" href="#" role="button">링크 등록</a>
+    </p>
+  </div>
+
+{% endblock %}

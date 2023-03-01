@@ -65,13 +65,13 @@ def login():
     return resp
 
 
+
 @app.route('/detail/<variable>', methods=['GET'])
 @jwt_required()
 def detailPage(variable):
     current_user = get_jwt_identity()
     product_info = db.product.find_one({'name': variable}, {'_id': 0})
     return render_template('detail.html', current_user=current_user, product_info=product_info), 200
-
 
 # 회원가입
 @app.route('/signup', methods=['GET'])
@@ -97,19 +97,16 @@ def signup():
         return '존재하는 이메일입니다.', 400
 
 # 참여하기 추가
-
-
 @app.route('/add-to-buyer', methods=['POST'])
 def addToBuyer():
     participateUser = request.form['user_give']
     product_name = request.form['name_give']
     db.product.find_one_and_update(
-        {'name': product_name},
-        {'$push': {'buyer': participateUser},
-         '$inc': {'buyerCount': 1}}, {'_id': 0})
+        {'name': product_name}, {'$push': {'buyer': participateUser}})
     return jsonify({'msg': 'success'})
 
 
+# DB 카테고리 user 제외하고 가져오기    
 @app.route('/group-list', methods=['GET'])
 def show_group_category():
     all_group = db.list_collection_names()
@@ -164,7 +161,7 @@ def getData(url, category, count):
     db.product.insert_one(doc)
 
 
-
+# 좋아요 count
 @app.route('/like', methods=['POST'])
 def likeit():
     name = request.form['name']
@@ -177,6 +174,10 @@ def likeit():
 
     return jsonify({'return': 'success'})
 
+# 상품등록
+@app.route('/register')
+def register():
+    return render_template('register.html')
 
 
 if __name__ == '__main__':
